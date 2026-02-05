@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class AudioManager : Singleton<AudioManager>
 {
-    [SerializeField] AudioSource bgm;   // ºê±İ
-    [SerializeField] AudioSource sfx;   // È¿°úÀ½
+    [SerializeField] AudioSource bgm;   // ë¸Œê¸ˆ
+    [SerializeField] AudioSource sfx;   // íš¨ê³¼ìŒ
 
 
-    // ¹è°æÀ½¾ÇÀ» Àç»ıÇÕ´Ï´Ù.
+    // ë°°ê²½ ìŒì•…ì„ ì¬ìƒí•©ë‹ˆë‹¤.
     public void PlayerBGM(AudioClip clip)
     {
-        if (bgm.clip == clip)  // Áö±İ ³ª¿À´Â bgm°ú °°´Ù¸é ½ÇÇà ¾ÈÇÔ
+        if (bgm.clip == clip)  // ì§€ê¸ˆ ë‚˜ì˜¤ëŠ” bgmê³¼ ê°™ë‹¤ë©´ ì‹¤í–‰ ì•ˆí•¨
         return;
 
         bgm.clip = clip;
@@ -18,7 +18,7 @@ public class AudioManager : Singleton<AudioManager>
     }
 
 
-    // È¿°úÀ½À» ÇÑ ¹ø Àç»ıÇÕ´Ï´Ù.
+    // íš¨ê³¼ìŒì„ í•œ ë²ˆ ì¬ìƒí•©ë‹ˆë‹¤.
     public void PlaySFX(AudioClip clip)
     {
         sfx.PlayOneShot(clip);

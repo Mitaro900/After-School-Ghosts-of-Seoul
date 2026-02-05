@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class UIManager : Singleton<UIManager>
 {
-    // UI¸¦ ¿±´Ï´Ù
+    // UIë¥¼ ì—½ë‹ˆë‹¤.
     public void OpenUI(GameObject ui)
     {
         ui.SetActive(true);

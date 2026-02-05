@@ -1,9 +1,9 @@
 
 using UnityEngine.SceneManagement;
 
-public class SceneLoderManager : Singleton<SceneLoderManager>
+public class SceneLoader : Singleton<SceneLoader>
 {
-    // ¾ÀÀ» ÀüÈ¯ ÇÕ´Ï´Ù.
+    // ì”¬ì„ ì „í™˜ í•©ë‹ˆë‹¤.
     public void LoadScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
