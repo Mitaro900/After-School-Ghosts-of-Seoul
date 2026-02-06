@@ -89,7 +89,8 @@ public class Player : MonoBehaviour
             float moveX = moveInput.x * xMoveSpeed * Time.deltaTime;
             Vector3 nextPos = pos + new Vector3(moveX, 0, 0);   //  이동했을때 도착하는 중심 위치
 
-            Vector2 checkPos = new Vector2(nextPos.x + halfSize.x * Mathf.Sign(x), nextPos.y);   // 도착하는 중심 위치 + 박스콜라이더 가장자리 * 방향 정규화, 현재 y위치 (예정)
+            float edgeY = boxCol.bounds.min.y;  // 박스 콜라이더 바닥 기준 (X 이동 감지는 바닥이랑 닿는지 확인)
+            Vector2 checkPos = new Vector2(nextPos.x + halfSize.x * Mathf.Sign(x), edgeY + boxSize.y / 2f);   // 이동하려는 X 위치의 박스 콜라이더 가장자리 위치, 박스콜라이더 중심 Y 위치 (edgeY는 바닥 기준, 여기에 절반 높이를 더해 중심을 계산)
 
             Collider2D hit = Physics2D.OverlapBox(checkPos, new Vector2(0.05f, boxSize.y), 0f, groundLayer); // 콜라이더 옆에 0.05f box를 만들어 감지시킴
 
@@ -103,7 +104,9 @@ public class Player : MonoBehaviour
             float moveY = moveInput.y * yMoveSpeed * Time.deltaTime;
             Vector3 nextPos = pos + new Vector3(0, moveY, 0);
 
-            Vector2 checkPos = new Vector2(nextPos.x, nextPos.y + halfSize.y * Mathf.Sign(y));
+            // 이동 방향 끝부분 체크
+            float edgeY = (moveInput.y > 0) ? boxCol.bounds.max.y : boxCol.bounds.min.y;    // 움직이는 y값에 따라 BoxCol의 y의 최대값만 가져옴 
+            Vector2 checkPos = new Vector2(nextPos.x, edgeY + 0.05f * Mathf.Sign(y));
 
             Collider2D hit = Physics2D.OverlapBox(checkPos, new Vector2(boxSize.x, 0.05f), 0f, groundLayer);
 
