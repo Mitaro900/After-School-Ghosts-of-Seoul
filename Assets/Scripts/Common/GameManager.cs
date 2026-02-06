@@ -35,6 +35,7 @@ public class GameManager : Singleton<GameManager>
 
     public void SetPlayer(Player p)
     {
+        // 임시로 Player Awke에서 사용중 (InGame State로 넘어갈시 플레이어쪽으로 가게하기)
         player = p;
         CameraManager.Instance.FollowCamera(player.transform);
     }

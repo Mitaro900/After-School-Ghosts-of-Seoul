@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        // E키 누를시 NPC와 대화 (움직임 차단)
         if (currentNPC != null && Input.GetKeyDown(KeyCode.E))
         {
             currentNPC.OnInteract();
@@ -42,19 +43,21 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
+        // NPC 감지시 E키를 눌러주세요 나타남
         if (col.CompareTag("NPC"))
         {
             currentNPC = col.GetComponent<NPC>();
-            currentNPC.ShowInteractUI();
+            currentNPC.ShowPressEkeyUI();
         }
     }
 
     private void OnTriggerExit2D(Collider2D col)
     {
+        // NPC 감지시 E키를 눌러주세요 숨김
         if (col.CompareTag("NPC"))
         {
             NPC npc = col.GetComponent<NPC>();
-            npc.HideInteractUI();
+            npc.HidePressEkeyUI();
             currentNPC = null;
         }
     }
