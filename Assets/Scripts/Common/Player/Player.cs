@@ -29,12 +29,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // E키 누를시 NPC와 대화 (움직임 차단)
-        if (currentNPC != null && Input.GetKeyDown(KeyCode.E))
-        {
-            currentNPC.OnInteract();
-            isMove = false;
-        }
+        TalkToNPC();
 
         if (isMove)
         Move();
@@ -63,7 +58,22 @@ public class Player : MonoBehaviour
     }
 
 
+    private void TalkToNPC()
+    {
+        // E키 누를시 NPC와 대화 (움직임 차단)
+        if (currentNPC != null && Input.GetKeyDown(KeyCode.E))
+        {
+            currentNPC.OnInteract();
+            isMove = false;
+        }
 
+        // ESC키 누를시 NPC와 대화 끝 (움직임 허용)
+        if (currentNPC != null && Input.GetKeyDown(KeyCode.Escape))
+        {
+            currentNPC.OffInteract();
+            isMove = true;
+        }
+    }
 
 
 

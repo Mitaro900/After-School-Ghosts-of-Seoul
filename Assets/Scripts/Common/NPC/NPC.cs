@@ -5,6 +5,8 @@ public class NPC : MonoBehaviour
     [Header("NPC Info")]
     [SerializeField] protected string npcName;
     [SerializeField] protected GameObject pressE;
+    [SerializeField] protected GameObject chatUI;
+    public bool isChatActive = false;
 
 
 
@@ -12,17 +14,28 @@ public class NPC : MonoBehaviour
     public void ShowPressEkeyUI()
     {
         pressE.SetActive(true);
+        isChatActive = true;
     }
 
     // E키를 눌러주세요 비활성화
     public void HidePressEkeyUI()
     {
         pressE.SetActive(false);
+        isChatActive = false;
     }
 
     // NPC 대화시 나올것들 (일단 대화, 퀘스트 대화 나뉘게)
     public virtual void OnInteract()
     {
-        Debug.Log("NPC 대화 시작");
+        if (!isChatActive) return;
+        chatUI.SetActive(true);
+    }
+
+    // NPC 대화 취소시 나올것들
+    public virtual void OffInteract()
+    {
+        if (!isChatActive) return;
+        isChatActive = false;
+        chatUI.SetActive(false);
     }
 }
