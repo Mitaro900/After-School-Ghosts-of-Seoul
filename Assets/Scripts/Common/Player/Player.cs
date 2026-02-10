@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Windows;
 
 public class Player : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float xMoveSpeed = 5f; // 좌우 속도
     [SerializeField] private float yMoveSpeed = 3f; // 상하 속도
     private bool isMove = true;
+    private PlayerInput inputSty;
 
 
     [Header("Ground Check")]
@@ -22,6 +24,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        inputSty = GetComponent<PlayerInput>();
         boxCol = GetComponent<BoxCollider2D>();
         GameManager.Instance.SetPlayer(this);  // 게임매니저에게 카메라 타겟을 Player로 지정
     }
@@ -61,14 +64,14 @@ public class Player : MonoBehaviour
     private void TalkToNPC()
     {
         // E키 누를시 NPC와 대화 (움직임 차단)
-        if (currentNPC != null && Input.GetKeyDown(KeyCode.E))
+        if (currentNPC != null && inputSty.interactAction.WasPressedThisFrame())
         {
             currentNPC.OnInteract();
             isMove = false;
         }
 
         // ESC키 누를시 NPC와 대화 끝 (움직임 허용)
-        if (currentNPC != null && Input.GetKeyDown(KeyCode.Escape))
+        if (currentNPC != null && inputSty.cancelAction.WasPressedThisFrame())
         {
             currentNPC.OffInteract();
             isMove = true;
@@ -79,10 +82,7 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float y = Input.GetAxisRaw("Vertical");
-
-        Vector2 moveInput = new Vector2(x, y);
+        Vector2 moveInput = inputSty.moveAction.ReadValue<Vector2>();
 
         if (moveInput.sqrMagnitude > 1f)    // 대각선 이동시 빠르지 1f로 고정하여 속도가 더 빠르지 않게함
             moveInput.Normalize();
@@ -100,7 +100,7 @@ public class Player : MonoBehaviour
             Vector3 nextPos = pos + new Vector3(moveX, 0, 0);   //  이동했을때 도착하는 중심 위치
 
             float edgeY = boxCol.bounds.min.y;  // 박스 콜라이더 바닥 기준 (X 이동 감지는 바닥이랑 닿는지 확인)
-            Vector2 checkPos = new Vector2(nextPos.x + halfSize.x * Mathf.Sign(x), edgeY + boxSize.y / 2f);   // 이동하려는 X 위치의 박스 콜라이더 가장자리 위치, 박스콜라이더 중심 Y 위치 (edgeY는 바닥 기준, 여기에 절반 높이를 더해 중심을 계산)
+            Vector2 checkPos = new Vector2(nextPos.x + halfSize.x * Mathf.Sign(moveInput.x), edgeY + boxSize.y / 2f);   // 이동하려는 X 위치의 박스 콜라이더 가장자리 위치, 박스콜라이더 중심 Y 위치 (edgeY는 바닥 기준, 여기에 절반 높이를 더해 중심을 계산)
 
             Collider2D hit = Physics2D.OverlapBox(checkPos, new Vector2(0.05f, boxSize.y), 0f, groundLayer); // 콜라이더 옆에 0.05f box를 만들어 감지시킴
 
@@ -116,7 +116,7 @@ public class Player : MonoBehaviour
 
             // 이동 방향 끝부분 체크
             float edgeY = (moveInput.y > 0) ? boxCol.bounds.max.y : boxCol.bounds.min.y;    // 움직이는 y값에 따라 BoxCol의 y의 최대값만 가져옴 
-            Vector2 checkPos = new Vector2(nextPos.x, edgeY + 0.05f * Mathf.Sign(y));
+            Vector2 checkPos = new Vector2(nextPos.x, edgeY + 0.05f * Mathf.Sign(moveInput.y));
 
             Collider2D hit = Physics2D.OverlapBox(checkPos, new Vector2(boxSize.x, 0.05f), 0f, groundLayer);
 

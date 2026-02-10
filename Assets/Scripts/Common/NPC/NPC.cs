@@ -28,7 +28,7 @@ public class NPC : MonoBehaviour
     public virtual void OnInteract()
     {
         if (!isChatActive) return;
-        chatUI.SetActive(true);
+        UIManager.Instance.OpenUI(chatUI);
     }
 
     // NPC 대화 취소시 나올것들
@@ -36,6 +36,6 @@ public class NPC : MonoBehaviour
     {
         if (!isChatActive) return;
         isChatActive = false;
-        chatUI.SetActive(false);
+        UIManager.Instance.CloseUI(chatUI);
     }
 }

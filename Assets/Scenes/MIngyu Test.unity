@@ -2287,6 +2287,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1643047810}
   - component: {fileID: 1643047813}
+  - component: {fileID: 1643047815}
   - component: {fileID: 1643047812}
   - component: {fileID: 1643047814}
   m_Layer: 0
@@ -2403,6 +2404,101 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1643047815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1643047809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 333e0b673ecbd4749a1aa5b43040a865, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
+  moveAction:
+    m_Name: Move
+    m_Type: 0
+    m_ExpectedControlType: Vector2
+    m_Id: 2e2c9e7c-7768-4e9c-abd7-1411a701e0b6
+    m_Processors: AxisDeadzone
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 2D Vector
+      m_Id: 6e17dea1-1cf9-4c6f-9a45-b615a5a68f4f
+      m_Path: 2DVector
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move
+      m_Flags: 4
+    - m_Name: up
+      m_Id: 453c0cc4-a5eb-4b6d-8e99-1102e1fe64a3
+      m_Path: <Keyboard>/w
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move
+      m_Flags: 8
+    - m_Name: down
+      m_Id: 9f43fb3c-70ad-42d9-b85b-4f8f0e15968a
+      m_Path: <Keyboard>/s
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move
+      m_Flags: 8
+    - m_Name: left
+      m_Id: fa23aa32-3550-4b41-a1e8-05c525e02cab
+      m_Path: <Keyboard>/a
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move
+      m_Flags: 8
+    - m_Name: right
+      m_Id: 141a049b-a30a-410a-8853-03b36920ce2c
+      m_Path: <Keyboard>/d
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move
+      m_Flags: 8
+    m_Flags: 0
+  cancelAction:
+    m_Name: Cancel
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: 425f0683-b38e-4565-b034-2412ef79ec6f
+    m_Processors: 
+    m_Interactions: Tap
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 08668aed-2f61-4df9-b2f9-a8a515cc9b98
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Cancel
+      m_Flags: 0
+    m_Flags: 0
+  interactAction:
+    m_Name: Interact
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: 6acb7223-b374-4ba5-b8a8-3a46136a06fc
+    m_Processors: 
+    m_Interactions: Tap
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: d0295c8d-680e-41de-8633-8db0ec32894b
+      m_Path: <Keyboard>/e
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Interact
+      m_Flags: 0
+    m_Flags: 0
 --- !u!1 &1668139050
 GameObject:
   m_ObjectHideFlags: 0
