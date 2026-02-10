@@ -7,7 +7,6 @@ public class Player : MonoBehaviour
     [SerializeField] private float xMoveSpeed = 5f; // 좌우 속도
     [SerializeField] private float yMoveSpeed = 3f; // 상하 속도
     private bool isMove = true;
-    private PlayerInput inputSty;
 
 
     [Header("Ground Check")]
@@ -24,7 +23,6 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        inputSty = GetComponent<PlayerInput>();
         boxCol = GetComponent<BoxCollider2D>();
         GameManager.Instance.SetPlayer(this);  // 게임매니저에게 카메라 타겟을 Player로 지정
     }
@@ -64,14 +62,14 @@ public class Player : MonoBehaviour
     private void TalkToNPC()
     {
         // E키 누를시 NPC와 대화 (움직임 차단)
-        if (currentNPC != null && inputSty.interactAction.WasPressedThisFrame())
+        if (currentNPC != null && PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
         {
             currentNPC.OnInteract();
             isMove = false;
         }
 
         // ESC키 누를시 NPC와 대화 끝 (움직임 허용)
-        if (currentNPC != null && inputSty.cancelAction.WasPressedThisFrame())
+        if (currentNPC != null && PlayerInputManager.Instance.cancelAction.WasPressedThisFrame())
         {
             currentNPC.OffInteract();
             isMove = true;
@@ -82,7 +80,7 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        Vector2 moveInput = inputSty.moveAction.ReadValue<Vector2>();
+        Vector2 moveInput = PlayerInputManager.Instance.moveAction.ReadValue<Vector2>();
 
         if (moveInput.sqrMagnitude > 1f)    // 대각선 이동시 빠르지 1f로 고정하여 속도가 더 빠르지 않게함
             moveInput.Normalize();

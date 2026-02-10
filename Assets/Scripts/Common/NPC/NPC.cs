@@ -6,6 +6,8 @@ public class NPC : MonoBehaviour
     [SerializeField] protected string npcName;
     [SerializeField] protected GameObject pressE;
     [SerializeField] protected GameObject chatUI;
+
+
     public bool isChatActive = false;
 
 
