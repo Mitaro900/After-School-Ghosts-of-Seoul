@@ -15,8 +15,8 @@ public class UIManager : Singleton<UIManager>
         ui.SetActive(false);
     }
 
-    public void Chat(SpeakerType type, string text, Sprite picture, float speed)
+    public void Chat(BaseChat sender, SpeakerType type, string text, float speed)
     {
-        chatUI.Chat(type, text, picture, speed);
+        chatUI.Chat(sender, type, text, speed);
     }
 }
