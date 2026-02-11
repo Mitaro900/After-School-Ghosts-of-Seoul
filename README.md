@@ -20,3 +20,13 @@ AppToken = (서버에서 사용하는 경우 동일 값 입력)
 1. Unity에서 Play ▶
 2. 채팅창에서 메시지 입력
 3. NPC 응답 출력 확인
+
+🛠 요구사항
+
+- Unity 2022 LTS 이상
+
+- TextMeshPro
+
+- Input System (New)
+
+- Node.js 18+ (서버 실행 시)
