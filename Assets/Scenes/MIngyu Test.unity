@@ -2432,7 +2432,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af89426cc94a2d540bc1ad5d5d6562dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  npcName: 
+  npcData: {fileID: 11400000, guid: 0b8c3a63b3f5ba349965dbb48a32b3f9, type: 2}
   pressE: {fileID: 1181999474}
   chatUI: {fileID: 417316565}
   isChatActive: 0
