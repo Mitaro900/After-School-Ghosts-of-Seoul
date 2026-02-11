@@ -27,8 +27,10 @@ public class ChatUI : MonoBehaviour
     [Header("Profile Images")]
     [SerializeField] private Image playerProfile;   // 플레이어 프로필 이미지
     [SerializeField] private Image npcProfile;  // NPC 프로필 이미지
-    
 
+    [Header("References")]
+    [SerializeField] private OpenAIManager openAIManager;
+    public NPC npc; // 대화중인 NPC
 
     public void Chat(BaseChat sender, SpeakerType speaker, string text, float speed)
     {
@@ -41,6 +43,21 @@ public class ChatUI : MonoBehaviour
         bubble.InputText.text = ""; // 말풍선 입력값 초기화
 
         StartCoroutine(TypeText(bubble, text, speaker, sender, speed));
+
+        StartCoroutine(openAIManager.SendMessage(
+            text,
+            npc.NpcData.NpcPrompt,
+            (reply) =>
+            {
+                ChatBubble Nbubble = Instantiate(npcBubble).GetComponent<ChatBubble>();
+
+                Nbubble.transform.SetParent(contentRect, false); // 말풍선을 contentRect의 자식으로 붙임
+                Nbubble.boxRect.sizeDelta = new Vector2(600, 0); // 말풍선의 최대 x가 600이 넘지 않게함
+                Nbubble.InputText.text = ""; // 말풍선 입력값 초기화
+
+                StartCoroutine(TypeText(Nbubble, reply, SpeakerType.NPC, npc.NpcChat, speed));
+            }
+        ));
     }
 
 
@@ -50,24 +67,24 @@ public class ChatUI : MonoBehaviour
         TMP_Text tmp = bubble.InputText;    // 채팅 입력값 저장 
         Image targetProfile = speaker == SpeakerType.Player ? playerProfile : npcProfile;   // 어떤 캐릭터의 프로필인지 확인하고 저장
 
-        // 대화 시작시 기본 표정으로 변환
-        EmotionType currentEmotion = EmotionType.Neutral;
-        targetProfile.sprite = sender.GetEmotionSprite(currentEmotion);
+        //// 대화 시작시 기본 표정으로 변환
+        //EmotionType currentEmotion = EmotionType.Neutral;
+        //targetProfile.sprite = sender.GetEmotionSprite(currentEmotion);
 
         // 감정 파악 + 텍스트 타이핑
         for (int i = 0; i < text.Length; i++)
         {
-            // <angry> 같은 태그 감지
-            if (text[i] == '<')
-            {
-                // 태그가 참이라면 감정 이미지 적용
-                if (TryParseEmotion(text, ref i, out EmotionType newEmotion))
-                {
-                    currentEmotion = newEmotion;    // 적용된 감정을 현재 감정에 적용
-                    targetProfile.sprite = sender.GetEmotionSprite(currentEmotion); // 해당 이미지에 맞게 변환
-                    continue;
-                }
-            }
+            //// <angry> 같은 태그 감지
+            //if (text[i] == '<')
+            //{
+            //    // 태그가 참이라면 감정 이미지 적용
+            //    if (TryParseEmotion(text, ref i, out EmotionType newEmotion))
+            //    {
+            //        currentEmotion = newEmotion;    // 적용된 감정을 현재 감정에 적용
+            //        targetProfile.sprite = sender.GetEmotionSprite(currentEmotion); // 해당 이미지에 맞게 변환
+            //        continue;
+            //    }
+            //}
 
             tmp.text += text[i];
             UpdateBubbleSize(bubble);

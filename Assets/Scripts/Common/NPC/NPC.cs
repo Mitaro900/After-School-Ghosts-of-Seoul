@@ -4,8 +4,10 @@ public class NPC : MonoBehaviour
 {
     [Header("NPC Info")]
     [SerializeField] protected NpcData npcData;
+    public NpcData NpcData => npcData;
     [SerializeField] protected GameObject pressE;
     [SerializeField] protected GameObject chatUI;
+    public NpcChat NpcChat => chatUI.GetComponent<NpcChat>();
 
     public bool isChatActive = false;
 

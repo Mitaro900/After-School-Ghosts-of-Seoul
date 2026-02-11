@@ -5,8 +5,10 @@ public class NpcData : ScriptableObject
 {
     [SerializeField]
     private string npcName;
+    public string NpcName => npcName;
 
     [SerializeField]
     [TextArea]
     private string npcPrompt;
+    public string NpcPrompt => npcPrompt;
 }
