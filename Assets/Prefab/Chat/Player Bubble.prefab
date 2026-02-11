@@ -27,7 +27,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4687317267205225868}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -9719.999}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -55,7 +55,6 @@ MonoBehaviour:
   boxRect: {fileID: 1957862691889207278}
   TextRect: {fileID: 8729961745013450777}
   InputText: {fileID: 2647094444102597809}
-  UserImage: {fileID: 0}
 --- !u!114 &5406618525776451362
 MonoBehaviour:
   m_ObjectHideFlags: 0
