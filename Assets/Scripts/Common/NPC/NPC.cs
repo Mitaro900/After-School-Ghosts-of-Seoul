@@ -3,14 +3,11 @@ using UnityEngine;
 public class NPC : MonoBehaviour
 {
     [Header("NPC Info")]
-    [SerializeField] protected string npcName;
+    [SerializeField] protected NpcData npcData;
     [SerializeField] protected GameObject pressE;
     [SerializeField] protected GameObject chatUI;
 
-
     public bool isChatActive = false;
-
-
 
     // E키를 눌러주세요 활성화
     public void ShowPressEkeyUI()
