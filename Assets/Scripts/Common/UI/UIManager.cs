@@ -4,15 +4,20 @@ public class UIManager : Singleton<UIManager>
 {
     [SerializeField] private protected ChatUI chatUI;
 
-    // UI를 엽니다.
-    public void OpenUI(GameObject ui)
+    public void OpenUI(UIBase ui)
     {
-        ui.SetActive(true);
+        if (ui == null)
+        {
+            Debug.LogError("OpenUI: 전달된 ui가 null임");
+            return;
+        }
+
+        ui.Open();
     }
 
-    public void CloseUI(GameObject ui)
+    public void CloseUI(UIBase ui)
     {
-        ui.SetActive(false);
+        ui.Close();
     }
 
     public void Chat(BaseChat sender, SpeakerType type, string text, float speed)

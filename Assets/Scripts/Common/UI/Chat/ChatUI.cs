@@ -16,7 +16,7 @@ public enum EmotionType
     Sad
 }
 
-public class ChatUI : MonoBehaviour
+public class ChatUI : UIBase
 {
     [Header("Chat info")]
     [SerializeField] private GameObject playerBubble;
@@ -42,11 +42,18 @@ public class ChatUI : MonoBehaviour
         bubble.boxRect.sizeDelta = new Vector2(600, 0); // 말풍선의 최대 x가 600이 넘지 않게함
         bubble.InputText.text = ""; // 말풍선 입력값 초기화
 
-        StartCoroutine(TypeText(bubble, text, speaker, sender, speed));
+        if (speaker == SpeakerType.Player && npc == null)
+        {
+            Player player = sender.GetComponentInParent<Player>();
+            if (player != null)
+                npc = player.currentNPC; // 처음 한 번만 가져와서 저장
+        }
 
+
+        StartCoroutine(TypeText(bubble, text, speaker, sender, speed));
         StartCoroutine(openAIManager.SendMessage(
             text,
-            npc.NpcData.NpcPrompt,
+            npc.NpcData.NpcPrompt, // 플레이어의 currentNPC의 정보를 받아 씀
             (reply) =>
             {
                 ChatBubble Nbubble = Instantiate(npcBubble).GetComponent<ChatBubble>();
@@ -55,7 +62,7 @@ public class ChatUI : MonoBehaviour
                 Nbubble.boxRect.sizeDelta = new Vector2(600, 0); // 말풍선의 최대 x가 600이 넘지 않게함
                 Nbubble.InputText.text = ""; // 말풍선 입력값 초기화
 
-                StartCoroutine(TypeText(Nbubble, reply, SpeakerType.NPC, npc.NpcChat, speed));
+                StartCoroutine(TypeText(Nbubble, reply, SpeakerType.NPC, npc, speed));
             }
         ));
     }
@@ -67,24 +74,24 @@ public class ChatUI : MonoBehaviour
         TMP_Text tmp = bubble.InputText;    // 채팅 입력값 저장 
         Image targetProfile = speaker == SpeakerType.Player ? playerProfile : npcProfile;   // 어떤 캐릭터의 프로필인지 확인하고 저장
 
-        //// 대화 시작시 기본 표정으로 변환
-        //EmotionType currentEmotion = EmotionType.Neutral;
-        //targetProfile.sprite = sender.GetEmotionSprite(currentEmotion);
+        // 대화 시작시 기본 표정으로 변환
+        EmotionType currentEmotion = EmotionType.Neutral;
+        targetProfile.sprite = sender.GetEmotionSprite(currentEmotion);
 
         // 감정 파악 + 텍스트 타이핑
         for (int i = 0; i < text.Length; i++)
         {
-            //// <angry> 같은 태그 감지
-            //if (text[i] == '<')
-            //{
-            //    // 태그가 참이라면 감정 이미지 적용
-            //    if (TryParseEmotion(text, ref i, out EmotionType newEmotion))
-            //    {
-            //        currentEmotion = newEmotion;    // 적용된 감정을 현재 감정에 적용
-            //        targetProfile.sprite = sender.GetEmotionSprite(currentEmotion); // 해당 이미지에 맞게 변환
-            //        continue;
-            //    }
-            //}
+            // <angry> 같은 태그 감지
+            if (text[i] == '<')
+            {
+                // 태그가 참이라면 감정 이미지 적용
+                if (TryParseEmotion(text, ref i, out EmotionType newEmotion))
+                {
+                    currentEmotion = newEmotion;    // 적용된 감정을 현재 감정에 적용
+                    targetProfile.sprite = sender.GetEmotionSprite(currentEmotion); // 해당 이미지에 맞게 변환
+                    continue;
+                }
+            }
 
             tmp.text += text[i];
             UpdateBubbleSize(bubble);
@@ -135,6 +142,13 @@ public class ChatUI : MonoBehaviour
     {
         Canvas.ForceUpdateCanvases();   // 캔버스 레이아웃을 즉시 갱신
         scrollRect.verticalNormalizedPosition = 0f; /// ScrollRect의 스크롤 위치를 맨 아래로 설정
+    }
+
+    // 채팅 끝내면 npc값 저장 초기화
+    protected override void OnClose()
+    {
+        base.OnClose();
+        npc = null;
     }
 }
 

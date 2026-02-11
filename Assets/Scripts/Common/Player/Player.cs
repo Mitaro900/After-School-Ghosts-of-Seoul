@@ -14,9 +14,10 @@ public class Player : MonoBehaviour
 
 
     [Header("NPC Info")]
-    [SerializeField] private NPC currentNPC;
+    public NPC currentNPC;
 
-
+    [Header("Other")]
+    [SerializeField] private GameObject chatInputUI;
     private BoxCollider2D boxCol;   // Ground를 벗어나지 않을 콜라이더
 
 
@@ -65,6 +66,7 @@ public class Player : MonoBehaviour
         if (currentNPC != null && PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
         {
             currentNPC.OnInteract();
+            chatInputUI.gameObject.SetActive(true);
             isMove = false;
         }
 
@@ -72,6 +74,7 @@ public class Player : MonoBehaviour
         if (currentNPC != null && PlayerInputManager.Instance.cancelAction.WasPressedThisFrame())
         {
             currentNPC.OffInteract();
+            chatInputUI.gameObject.SetActive(false);
             isMove = true;
         }
     }
