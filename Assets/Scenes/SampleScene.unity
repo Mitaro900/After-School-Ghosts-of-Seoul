@@ -304,7 +304,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0.000061035156}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 30}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &338066371
 MonoBehaviour:
@@ -628,7 +628,7 @@ RectTransform:
   m_Father: {fileID: 1513586157}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -645,7 +645,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1116,7 +1116,6 @@ GameObject:
   - component: {fileID: 885528963}
   - component: {fileID: 885528962}
   - component: {fileID: 885528961}
-  - component: {fileID: 885528960}
   m_Layer: 5
   m_Name: InputField (TMP)
   m_TagString: Untagged
@@ -1144,25 +1143,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -446}
   m_SizeDelta: {x: 1181.07, y: 75.1}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &885528960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 885528958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf3c29b44e68d8e4085631c0296dca53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::inputChat
-  type: 0
-  chatSpeed: 0.04
-  Neutral: {fileID: 2343975074871740513, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
-  Happy: {fileID: -8631900063232487059, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
-  Angry: {fileID: 2612849824084976639, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
-  Sad: {fileID: 2553910784619955092, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
-  inputField: {fileID: 885528961}
 --- !u!114 &885528961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2012,9 +1992,9 @@ MonoBehaviour:
   m_DecelerationRate: 0.01
   m_ScrollSensitivity: 150
   m_Viewport: {fileID: 1305696345}
-  m_HorizontalScrollbar: {fileID: 1564515714}
+  m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 1564515714}
-  m_HorizontalScrollbarVisibility: 1
+  m_HorizontalScrollbarVisibility: 0
   m_VerticalScrollbarVisibility: 1
   m_HorizontalScrollbarSpacing: -3
   m_VerticalScrollbarSpacing: 0
@@ -2871,6 +2851,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1643047810}
   - component: {fileID: 1643047813}
+  - component: {fileID: 1643047815}
   - component: {fileID: 1643047812}
   - component: {fileID: 1643047814}
   m_Layer: 0
@@ -2989,6 +2970,25 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1643047815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1643047809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf3c29b44e68d8e4085631c0296dca53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::inputChat
+  type: 0
+  chatSpeed: 0.04
+  Neutral: {fileID: 2343975074871740513, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
+  Happy: {fileID: -8631900063232487059, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
+  Angry: {fileID: 2612849824084976639, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
+  Sad: {fileID: 2553910784619955092, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
+  inputField: {fileID: 885528961}
 --- !u!1 &1668139050
 GameObject:
   m_ObjectHideFlags: 0

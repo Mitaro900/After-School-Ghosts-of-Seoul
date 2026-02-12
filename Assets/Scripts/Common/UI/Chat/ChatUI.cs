@@ -44,7 +44,7 @@ public class ChatUI : UIBase
 
         if (speaker == SpeakerType.Player && npc == null)
         {
-            Player player = sender.GetComponentInParent<Player>();
+            Player player = sender.GetComponent<Player>();
             if (player != null)
                 npc = player.currentNPC; // 처음 한 번만 가져와서 저장
         }
