@@ -6,7 +6,6 @@ public class NPC : BaseChat
     [SerializeField] protected NpcData npcData;
     public NpcData NpcData => npcData;
     [SerializeField] protected GameObject pressE;
-    [SerializeField] protected UIBase chatUI;
 
     public bool isChatActive = false;
 
@@ -28,7 +27,10 @@ public class NPC : BaseChat
     public virtual void OnInteract()
     {
         if (!isChatActive) return;
-        UIManager.Instance.OpenUI(chatUI);
+        var uiData = new UIBaseData();
+        UIManager.Instance.OpenUI<ChatUI>(uiData);
+        var chatUI = UIManager.Instance.GetActiveUI<ChatUI>();
+        chatUI.SetChat(this);
     }
 
     // NPC 대화 취소시 나올것들
@@ -36,6 +38,6 @@ public class NPC : BaseChat
     {
         if (!isChatActive) return;
         isChatActive = false;
-        UIManager.Instance.CloseUI(chatUI);
+        UIManager.Instance.CloseUI(UIManager.Instance.GetActiveUI<ChatUI>());
     }
 }

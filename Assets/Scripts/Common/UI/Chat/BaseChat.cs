@@ -31,6 +31,6 @@ public class BaseChat : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(text)) return;
 
-        UIManager.Instance.Chat(this, type, text, chatSpeed);
+        //UIManager.Instance.Chat(this, type, text, chatSpeed);
     }
 }

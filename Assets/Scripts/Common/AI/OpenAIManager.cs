@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Text;
+using Singleton.Component;
 
-public class OpenAIManager : MonoBehaviour
+public class OpenAIManager : SingletonComponent<OpenAIManager>
 {
     // 로컬 테스트: http://localhost:3000/chat
     // Android 에뮬레이터: http://10.0.2.2:3000/chat
@@ -13,6 +14,25 @@ public class OpenAIManager : MonoBehaviour
     // (옵션) 프록시에 간단 인증을 붙였을 때만 사용
     // 서버에서 X-App-Token 헤더를 검사하도록 만들면 됨.
     [SerializeField] private string appToken = "mygame-dev-token";
+
+    #region Singleton
+    protected override void AwakeInstance()
+    {
+
+    }
+
+    protected override bool InitInstance()
+    {
+        Initialize();
+
+        return true;
+    }
+
+    protected override void ReleaseInstance()
+    {
+
+    }
+    #endregion
 
     public IEnumerator SendMessage(string userMessage, string npcPrompt, System.Action<string> onComplete)
     {

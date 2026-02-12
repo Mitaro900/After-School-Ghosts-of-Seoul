@@ -8,14 +8,19 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     protected virtual void Awake()
     {
         // 중복 Instance 방지
-        if (Instance != null)   // Instance가 Null이 아닐경우
+        if (Instance != null && Instance != this)   // Instance가 Null이 아닐경우
         {
             Destroy(gameObject);    // 중복된 자신을 파괴함
             return;
         }
 
         // Instance가 씬이 넘어가도 파괴되지 않게함
-        Instance = this as T;   // 적용된 T를 Instance에 저장합니다.
+        Instance = (T)(object)this;   // 적용된 T를 Instance에 저장합니다.
         DontDestroyOnLoad(gameObject);
+    }
+
+    protected virtual void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 }

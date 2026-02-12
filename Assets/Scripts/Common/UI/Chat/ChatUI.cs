@@ -28,9 +28,7 @@ public class ChatUI : UIBase
     [SerializeField] private Image playerProfile;   // 플레이어 프로필 이미지
     [SerializeField] private Image npcProfile;  // NPC 프로필 이미지
 
-    [Header("References")]
-    [SerializeField] private OpenAIManager openAIManager;
-    public NPC npc; // 대화중인 NPC
+    private NPC npc; // 대화중인 NPC
 
     public void Chat(BaseChat sender, SpeakerType speaker, string text, float speed)
     {
@@ -51,7 +49,7 @@ public class ChatUI : UIBase
 
 
         StartCoroutine(TypeText(bubble, text, speaker, sender, speed));
-        StartCoroutine(openAIManager.SendMessage(
+        StartCoroutine(OpenAIManager.Instance.SendMessage(
             text,
             npc.NpcData.NpcPrompt, // 플레이어의 currentNPC의 정보를 받아 씀
             (reply) =>
@@ -145,10 +143,15 @@ public class ChatUI : UIBase
     }
 
     // 채팅 끝내면 npc값 저장 초기화
-    protected override void OnClose()
+    public override void CloseUI(bool isCloseAll = false)
     {
-        base.OnClose();
+        base.CloseUI(isCloseAll);
         npc = null;
+    }
+
+    public void SetChat(NPC chattingNpc)
+    {
+        npc = chattingNpc;
     }
 }
 
