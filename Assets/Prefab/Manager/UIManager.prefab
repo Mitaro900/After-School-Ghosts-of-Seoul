@@ -145,8 +145,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2298088555801742249}
   - {fileID: 7498923049551814944}
+  - {fileID: 2298088555801742249}
   - {fileID: 5741213328655914158}
   m_Father: {fileID: 4044675294583688868}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -173,7 +173,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
