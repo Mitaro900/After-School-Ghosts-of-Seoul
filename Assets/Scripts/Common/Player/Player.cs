@@ -16,18 +16,13 @@ public class Player : MonoBehaviour
     [Header("NPC Info")]
     public NPC currentNPC;
 
-    [Header("Other")]
-    [SerializeField] private GameObject chatInputUI;
     private BoxCollider2D boxCol;   // Ground를 벗어나지 않을 콜라이더
-
-
 
     private void Awake()
     {
         boxCol = GetComponent<BoxCollider2D>();
         GameManager.Instance.SetPlayer(this);  // 게임매니저에게 카메라 타겟을 Player로 지정
     }
-
 
     private void Update()
     {
@@ -36,7 +31,6 @@ public class Player : MonoBehaviour
         if (isMove)
         Move();
     }
-
 
     private void OnTriggerEnter2D(Collider2D col)
     {
@@ -59,14 +53,12 @@ public class Player : MonoBehaviour
         }
     }
 
-
     private void TalkToNPC()
     {
         // E키 누를시 NPC와 대화 (움직임 차단)
         if (currentNPC != null && PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
         {
             currentNPC.OnInteract();
-            chatInputUI.gameObject.SetActive(true);
             isMove = false;
         }
 
@@ -74,12 +66,9 @@ public class Player : MonoBehaviour
         if (currentNPC != null && PlayerInputManager.Instance.cancelAction.WasPressedThisFrame())
         {
             currentNPC.OffInteract();
-            chatInputUI.gameObject.SetActive(false);
             isMove = true;
         }
     }
-
-
 
     private void Move()
     {
