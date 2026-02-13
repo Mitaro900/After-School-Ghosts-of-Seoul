@@ -21,12 +21,13 @@ public class UIManager : SingletonComponent<UIManager>
     #region Singleton
     protected override void AwakeInstance()
     {
-
+        Initialize();
     }
 
     protected override bool InitInstance()
     {
-        Initialize();
+        UIEventSystem = GetComponentInChildren<EventSystem>();
+        m_Fade.transform.localScale = Vector3.zero;
 
         return true;
     }
