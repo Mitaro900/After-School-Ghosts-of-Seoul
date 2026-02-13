@@ -11,6 +11,8 @@ public class UIBaseData
 public class UIBase : MonoBehaviour
 {
     public Animation m_UIOpenAnim; //UI 열림 애니메이션
+    
+    public event Action<UIBase> RequestedClose; //UI 닫기 요청 이벤트
 
     private Action m_OnShow;    //UI 표시 시 실행할 액션
     private Action m_OnClose;   //UI 닫기 시 실행할 액션
@@ -21,7 +23,7 @@ public class UIBase : MonoBehaviour
         m_OnShow = null;     // 표시 액션 초기화
         m_OnClose = null;    // 닫기 액션 초기화
 
-        transform.SetParent(anchor);    // 부모 Transform 설정
+        transform.SetParent(anchor, false);    // 부모 Transform 설정
 
         var rectTransform = GetComponent<RectTransform>();    // RectTransform 컴포넌트 가져오기
         if (!rectTransform)    // RectTransform이 없는 경우
@@ -29,17 +31,17 @@ public class UIBase : MonoBehaviour
             return;    // 메서드 종료
         }
 
-        rectTransform.localPosition = new Vector3(0f, 0f, 0f);    // 로컬 위치 설정
-        rectTransform.localScale = new Vector3(1f, 1f, 1f);       // 로컬 스케일 설정
-        rectTransform.offsetMin = new Vector2(0, 0);              // 최소 오프셋 설정
-        rectTransform.offsetMax = new Vector2(0, 0);              // 최대 오프셋 설정
+        rectTransform.localPosition = Vector3.zero; // 로컬 위치 설정
+        rectTransform.localScale = Vector3.one;     // 로컬 스케일 설정
+        rectTransform.offsetMin = Vector2.zero;     // 최소 오프셋 설정
+        rectTransform.offsetMax = Vector2.zero;     // 최대 오프셋 설정
     }
 
     // UI 정보 설정 메서드
     public virtual void SetInfo(UIBaseData uiData)
     {
-        m_OnShow = uiData.OnShow;      // 표시 콜백 설정
-        m_OnClose = uiData.OnClose;    // 닫기 콜백 설정
+        m_OnShow = uiData?.OnShow;      // 표시 콜백 설정
+        m_OnClose = uiData?.OnClose;    // 닫기 콜백 설정
     }
 
 
@@ -64,7 +66,7 @@ public class UIBase : MonoBehaviour
         }
         m_OnClose = null;    // 닫기 콜백 초기화
 
-        UIManager.Instance.CloseUI(this);    // UI 매니저를 통해 UI 닫기
+        RequestedClose?.Invoke(this);
     }
 
     // 닫기 버튼 클릭 시 실행되는 메서드

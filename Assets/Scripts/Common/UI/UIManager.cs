@@ -79,6 +79,8 @@ public class UIManager : SingletonComponent<UIManager>
             return;
         }
 
+        BindCloseEvent(ui);
+
         if (isAlreadyOpen)
         {
             Debug.LogError($"{uiType} is already open.");
@@ -100,9 +102,16 @@ public class UIManager : SingletonComponent<UIManager>
 
     public void CloseUI(UIBase ui)
     {
+        if (!ui) return;
+
         System.Type uiType = ui.GetType();
 
+        if (!m_OpenUIPool.TryGetValue(uiType, out var go) || go != ui.gameObject)
+            return;
+
         Debug.Log($"CloseUI UI:{uiType}");
+
+        UnbindCloseEvent(ui);
 
         ui.gameObject.SetActive(false);
         m_OpenUIPool.Remove(uiType);
@@ -153,6 +162,23 @@ public class UIManager : SingletonComponent<UIManager>
         }
     }
 
+    private void BindCloseEvent(UIBase ui)
+    {
+        // 중복 구독 방지
+        ui.RequestedClose -= OnUIRequestedClose;
+        ui.RequestedClose += OnUIRequestedClose;
+    }
+
+    private void UnbindCloseEvent(UIBase ui)
+    {
+        ui.RequestedClose -= OnUIRequestedClose;
+    }
+
+    private void OnUIRequestedClose(UIBase ui)
+    {
+        CloseUI(ui);
+    }
+
     public void Fade(Color color, float startAlpha, float endAlpha, float duration, float startDelay, bool deactiveOnFinish, Action onFinish = null)
     {
         if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
@@ -189,9 +215,4 @@ public class UIManager : SingletonComponent<UIManager>
 
         onFinish?.Invoke();
     }
-
-    //public void Chat(BaseChat sender, SpeakerType type, string text, float speed)
-    //{
-    //    chatUI.Chat(sender, type, text, speed);
-    //}
 }

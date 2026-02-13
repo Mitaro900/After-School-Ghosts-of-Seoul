@@ -21,11 +21,7 @@ public class Player : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemChatText;
     [SerializeField] private GameObject iemChatUI;
 
-    [Header("Other")]
-    [SerializeField] private GameObject chatInputUI;
     private BoxCollider2D boxCol;   // Ground를 벗어나지 않을 콜라이더
-
-
 
     private void Awake()
     {
@@ -85,7 +81,6 @@ public class Player : MonoBehaviour
             if (currentNPC != null)
             {
                 currentNPC.OnInteract();
-                chatInputUI.gameObject.SetActive(true);
                 isMove = false;
             }
             if (currentItem != null)
@@ -101,7 +96,6 @@ public class Player : MonoBehaviour
         if (currentNPC != null && PlayerInputManager.Instance.cancelAction.WasPressedThisFrame())
         {
             currentNPC.OffInteract();
-            chatInputUI.gameObject.SetActive(false);
             isMove = true;
         }
     }
