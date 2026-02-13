@@ -1,5 +1,5 @@
+using TMPro;
 using UnityEngine;
-using UnityEngine.Windows;
 
 public class Player : MonoBehaviour
 {
@@ -15,6 +15,11 @@ public class Player : MonoBehaviour
 
     [Header("NPC Info")]
     public NPC currentNPC;
+
+    [Header("Item Info")]
+    public Item currentItem;
+    [SerializeField] private TextMeshProUGUI itemChatText;
+    [SerializeField] private GameObject iemChatUI;
 
     [Header("Other")]
     [SerializeField] private GameObject chatInputUI;
@@ -46,6 +51,12 @@ public class Player : MonoBehaviour
             currentNPC = col.GetComponent<NPC>();
             currentNPC.ShowPressEkeyUI();
         }
+
+        if (col.CompareTag("Item"))
+        {
+            currentItem = col.GetComponent<Item>();
+            currentItem.ShowPressEkeyUI();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D col)
@@ -53,9 +64,15 @@ public class Player : MonoBehaviour
         // NPC 감지시 E키를 눌러주세요 숨김
         if (col.CompareTag("NPC"))
         {
-            NPC npc = col.GetComponent<NPC>();
-            npc.HidePressEkeyUI();
+            currentNPC = col.GetComponent<NPC>();
+            currentNPC.HidePressEkeyUI();
             currentNPC = null;
+        }
+
+        if (col.CompareTag("Item"))
+        {
+            currentItem = col.GetComponent<Item>();
+            currentItem.HidePressEkeyUI();
         }
     }
 
@@ -63,11 +80,21 @@ public class Player : MonoBehaviour
     private void TalkToNPC()
     {
         // E키 누를시 NPC와 대화 (움직임 차단)
-        if (currentNPC != null && PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
+        if (PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
         {
-            currentNPC.OnInteract();
-            chatInputUI.gameObject.SetActive(true);
-            isMove = false;
+            if (currentNPC != null)
+            {
+                currentNPC.OnInteract();
+                chatInputUI.gameObject.SetActive(true);
+                isMove = false;
+            }
+            if (currentItem != null)
+            {
+                string text = currentItem.GetItemPrompt();
+
+                itemChatText.text = text;
+                iemChatUI.SetActive(true);
+            }
         }
 
         // ESC키 누를시 NPC와 대화 끝 (움직임 허용)
