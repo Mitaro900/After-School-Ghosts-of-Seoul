@@ -1,7 +1,8 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : BaseChat
 {
     [Header("Move")]
     [SerializeField] private float xMoveSpeed = 5f; // 좌우 속도
@@ -13,26 +14,27 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask groundLayer; // 체크할 땅
 
 
-    [Header("NPC Info")]
-    public NPC currentNPC;
-
     [Header("Item Info")]
-    public Item currentItem;
-    [SerializeField] private TextMeshProUGUI itemChatText;
-    [SerializeField] private GameObject iemChatUI;
+    [SerializeField] private Item currentItem;  // 현재 수집한 아이템
+    [SerializeField] private GameObject itemChatUI; // 아이템 독백대사 캔버스
+    [SerializeField] private TextMeshProUGUI itemChatText;  // 독백대사 텍스트
+    private CanvasGroup itemChatCG; // 캔버스 페이드 넣을 그룹
 
+
+    private NPC currentNPC; // NPC 저장
     private BoxCollider2D boxCol;   // Ground를 벗어나지 않을 콜라이더
 
     private void Awake()
     {
         boxCol = GetComponent<BoxCollider2D>();
+        itemChatCG = itemChatUI.GetComponent<CanvasGroup>();
         GameManager.Instance.SetPlayer(this);  // 게임매니저에게 카메라 타겟을 Player로 지정
     }
 
 
-    private void Update()
+    protected override void Update()
     {
-        TalkToNPC();
+        TalkToObject();
 
         if (isMove)
         Move();
@@ -73,22 +75,24 @@ public class Player : MonoBehaviour
     }
 
 
-    private void TalkToNPC()
+    private void TalkToObject()
     {
-        // E키 누를시 NPC와 대화 (움직임 차단)
+        // E키 누를시
         if (PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
         {
+            // NPC와 대화(움직임 차단)
             if (currentNPC != null)
             {
-                currentNPC.OnInteract();
+                currentNPC.OnInteract(this);
                 isMove = false;
             }
+
+            // item 대화(움직임 차단은 말해보자)
             if (currentItem != null)
             {
                 string text = currentItem.GetItemPrompt();
-
                 itemChatText.text = text;
-                iemChatUI.SetActive(true);
+                StartCoroutine(ShowItemChat());
             }
         }
 
@@ -147,5 +151,30 @@ public class Player : MonoBehaviour
         }
 
         transform.position = pos;
+    }
+
+
+    // 아이템 독백 대사 보여줌
+    private IEnumerator ShowItemChat()
+    {
+        itemChatUI.SetActive(true);
+
+        itemChatCG.alpha = 1f;
+
+        // 일정 시간 유지
+        yield return new WaitForSeconds(3f);
+
+        float time = 0f;
+
+        while (time < 1f)
+        {
+            time += Time.deltaTime;
+            itemChatCG.alpha = Mathf.Lerp(1f, 0f, time / 1f);
+            yield return null;
+        }
+
+        itemChatCG.alpha = 0f;
+        itemChatUI.SetActive(false);
+        itemChatCG.alpha = 1f;
     }
 }

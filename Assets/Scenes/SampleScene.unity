@@ -1172,7 +1172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af89426cc94a2d540bc1ad5d5d6562dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  type: 1
+  isPlayer: 0
   chatSpeed: 0.04
   Neutral: {fileID: 6236613712523845333, guid: 6e882c49e6f6859479359ac520f1dfa1, type: 3}
   Happy: {fileID: -3905000240898659254, guid: 6e882c49e6f6859479359ac520f1dfa1, type: 3}
@@ -1449,12 +1449,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf726fb07fd9af8418cd4250eaf65042, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
+  isPlayer: 0
+  chatSpeed: 0.04
+  Neutral: {fileID: 2343975074871740513, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
+  Happy: {fileID: -8631900063232487059, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
+  Angry: {fileID: 2612849824084976639, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
+  Sad: {fileID: 2553910784619955092, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
   xMoveSpeed: 5
   yMoveSpeed: 3
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  currentNPC: {fileID: 0}
   currentItem: {fileID: 0}
   itemChatText: {fileID: 0}
   iemChatUI: {fileID: 0}

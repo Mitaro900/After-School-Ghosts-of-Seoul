@@ -32,6 +32,7 @@ public class ChatUI : UIBase
     [SerializeField] private float typingSpeed = 0.02f; // 타이핑 속도
 
     private NPC npc; // 대화중인 NPC 저장
+    private Player player;
 
     public System.Action<string> OnSubmitText;
 
@@ -118,7 +119,7 @@ public class ChatUI : UIBase
 
         // 1) 플레이어 말풍선 타이핑(끝날 때까지 기다림)
         var pBubble = CreateBubble(isPlayer: true);
-        yield return StartCoroutine(TypeText(pBubble, playerText, true, npc, typingSpeed));
+        yield return StartCoroutine(TypeText(pBubble, playerText, true, player, typingSpeed));
 
         // 2) 서버 요청(플레이어 타이핑 끝난 뒤)
         string reply = null;
@@ -235,8 +236,9 @@ public class ChatUI : UIBase
         scrollRect.verticalNormalizedPosition = 0f; /// ScrollRect의 스크롤 위치를 맨 아래로 설정
     }
 
-    public void SetChat(NPC chattingNpc)
+    public void SetChat(NPC chattingNpc, Player chattingPlayer)
     {
         npc = chattingNpc;
+        player = chattingPlayer;
     }
 }
