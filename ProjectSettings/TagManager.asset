@@ -46,17 +46,8 @@ TagManager:
   - name: BackGrond
     uniqueID: 4071387475
     locked: 0
-  - name: NPC
-    uniqueID: 2939760915
-    locked: 0
   - name: Object
     uniqueID: 2355760079
-    locked: 0
-  - name: Player
-    uniqueID: 2462018461
-    locked: 0
-  - name: UI
-    uniqueID: 3569210435
     locked: 0
   m_RenderingLayers:
   - Default
