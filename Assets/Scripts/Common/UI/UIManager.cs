@@ -113,6 +113,8 @@ public class UIManager : SingletonComponent<UIManager>
 
         UnbindCloseEvent(ui);
 
+        ChatLogManager.Instance.EndSession();
+
         ui.gameObject.SetActive(false);
         m_OpenUIPool.Remove(uiType);
         m_ClosedUIPool[uiType] = ui.gameObject;

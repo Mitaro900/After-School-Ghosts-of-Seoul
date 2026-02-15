@@ -26,8 +26,11 @@ public class NPC : BaseChat
     // NPC 대화시 나올것들 (일단 대화, 퀘스트 대화 나뉘게)
     public virtual void OnInteract(Player player)
     {
+        ChatLogManager.Instance.StartSession(npcData);
+
         var uiData = new UIBaseData();
         UIManager.Instance.OpenUI<ChatUI>(uiData);
+
         var chatUI = UIManager.Instance.GetActiveUI<ChatUI>();
         chatUI.SetChat(this, player);
     }
@@ -36,6 +39,7 @@ public class NPC : BaseChat
     public virtual void OffInteract()
     {
         isChatActive = false;
+
         UIManager.Instance.CloseUI(UIManager.Instance.GetActiveUI<ChatUI>());
     }
 }

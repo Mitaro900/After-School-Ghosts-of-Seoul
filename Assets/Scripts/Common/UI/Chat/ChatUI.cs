@@ -120,6 +120,7 @@ public class ChatUI : UIBase
         // 1) 플레이어 말풍선 타이핑(끝날 때까지 기다림)
         var pBubble = CreateBubble(isPlayer: true);
         yield return StartCoroutine(TypeText(pBubble, playerText, true, player, typingSpeed));
+        ChatLogManager.Instance.AddLine(true, playerText);
 
         // 2) 서버 요청(플레이어 타이핑 끝난 뒤)
         string reply = null;
@@ -135,6 +136,7 @@ public class ChatUI : UIBase
         // 3) NPC 말풍선 타이핑(끝날 때까지)
         var nBubble = CreateBubble(isPlayer: false);
         yield return StartCoroutine(TypeText(nBubble, reply, false, npc, typingSpeed));
+        ChatLogManager.Instance.AddLine(false, reply);
 
         EndBusy();
     }
