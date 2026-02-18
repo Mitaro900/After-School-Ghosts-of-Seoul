@@ -95,13 +95,6 @@ public class Player : BaseChat
                 StartCoroutine(ShowItemChat());
             }
         }
-
-        // ESC키 누를시 NPC와 대화 끝 (움직임 허용)
-        if (currentNPC != null && PlayerInputManager.Instance.cancelAction.WasPressedThisFrame())
-        {
-            currentNPC.OffInteract();
-            isMove = true;
-        }
     }
 
 
@@ -176,5 +169,10 @@ public class Player : BaseChat
         itemChatCG.alpha = 0f;
         itemChatUI.SetActive(false);
         itemChatCG.alpha = 1f;
+    }
+
+    public void PlayerMove(bool MoveAllow)
+    {
+        isMove = MoveAllow;
     }
 }

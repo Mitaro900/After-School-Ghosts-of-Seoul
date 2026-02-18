@@ -27,6 +27,7 @@ public class ChatUI : UIBase
 
     [Header("References")]
     [SerializeField] private TMP_InputField input;
+    [SerializeField] private TMP_Text inputHelp;
 
     [Header("Typing")]
     [SerializeField] private float typingSpeed = 0.02f; // 타이핑 속도
@@ -68,6 +69,14 @@ public class ChatUI : UIBase
 
     private void Update()
     {
+        // 타이핑 중이 아니라면 채팅창 나가기 허용
+        if (npc != null && PlayerInputManager.Instance.cancelAction.WasPressedThisFrame() && !_busy)
+        {
+            npc.OffInteract();
+            player.PlayerMove(true);    // 플레이어 움직임 허용
+        }
+
+
         if (!input) return;
         if (_busy) return;
 
@@ -109,6 +118,7 @@ public class ChatUI : UIBase
     {
         _busy = true;
         if (input) input.interactable = false;
+        inputHelp.text = "채팅이 타이핑 되는동안 입력,ESC가 불가능 합니다.";
 
         if (npc == null)
         {
@@ -145,6 +155,7 @@ public class ChatUI : UIBase
     {
         _busy = false;
         if (input) input.interactable = true;
+        inputHelp.text = "텍스트를 입력하세요. (Esc를 누르면 종료됩니다.)";
         _turnCo = null;
     }
 

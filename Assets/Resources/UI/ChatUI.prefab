@@ -278,6 +278,8 @@ MonoBehaviour:
   playerProfile: {fileID: 8244031619631510781}
   npcProfile: {fileID: 1659199278431033541}
   input: {fileID: 7340142493220149886}
+  inputHelp: {fileID: 8558140791806555987}
+  typingSpeed: 0.02
 --- !u!1 &3829699333469760620
 GameObject:
   m_ObjectHideFlags: 0
