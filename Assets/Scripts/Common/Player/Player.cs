@@ -16,9 +16,12 @@ public class Player : BaseChat
     [SerializeField] private GameObject itemChatUI;
     [SerializeField] private TextMeshProUGUI itemChatText;
 
+    [Header("Object Info")]
+    [SerializeField] private QuestObject currentObject;
+
     private CanvasGroup itemChatCG;
     private NPC currentNPC;
-
+    private Coroutine itemChatCoroutine;
     private Rigidbody2D rb;
 
     private void Awake()
@@ -79,6 +82,12 @@ public class Player : BaseChat
             currentItem = col.GetComponent<Item>();
             currentItem.ShowPressEkeyUI();
         }
+
+        if (col.CompareTag("Object"))
+        {
+            currentObject = col.GetComponent<QuestObject>();
+            currentObject.ShowPressEkeyUI();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D col)
@@ -93,6 +102,12 @@ public class Player : BaseChat
         {
             currentItem.HidePressEkeyUI();
             currentItem = null;
+        }
+
+        if (col.CompareTag("Object"))
+        {
+            currentObject.HidePressEkeyUI();
+            currentObject = null;
         }
     }
 
@@ -110,9 +125,26 @@ public class Player : BaseChat
             {
                 string text = currentItem.GetItemPrompt();
                 itemChatText.text = text;
-                StartCoroutine(ShowItemChat());
+                PlayItemChat();
+            }
+
+            if (currentObject != null)
+            {
+                string text = currentObject.GetItemPrompt();
+                itemChatText.text = text;
+                PlayItemChat();
             }
         }
+    }
+
+    public void PlayItemChat()
+    {
+        if (itemChatCoroutine != null)
+        {
+            StopCoroutine(itemChatCoroutine);
+        }
+
+        itemChatCoroutine = StartCoroutine(ShowItemChat());
     }
 
     private IEnumerator ShowItemChat()

@@ -9,13 +9,13 @@ public class NPC : BaseChat
 
 
     // E키를 눌러주세요 활성화
-    public void ShowPressEkeyUI()
+    public virtual void ShowPressEkeyUI()
     {
         pressE.SetActive(true);
     }
 
     // E키를 눌러주세요 비활성화
-    public void HidePressEkeyUI()
+    public virtual void HidePressEkeyUI()
     {
         pressE.SetActive(false);
     }

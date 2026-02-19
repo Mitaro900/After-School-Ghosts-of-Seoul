@@ -3,6 +3,7 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
     [SerializeField] ItemData itemData;
+    [SerializeField] bool isQuest = false;
     [SerializeField] protected GameObject pressE;
     [SerializeField] protected GameObject outLine;
 
@@ -21,7 +22,17 @@ public class Item : MonoBehaviour
 
     public string GetItemPrompt()
     {
-        Destroy(gameObject); // 임시로 제거 (나중에 아이템 관련 중앙 관리자를 통해 오브젝트를 열거나 NPC에게 관련정보주기)
+        // 퀘스트가 아닐경우 퀘스트 바로 완료 처리
+        if (!isQuest)
+        {
+            QuestManager.Instance.CompleteQuest(itemData);
+        }
+        else
+        {
+            QuestManager.Instance.StartQuest(itemData);
+        }
+
+        Destroy(gameObject);
         return itemData.ItemPrompt;
     }
 }
