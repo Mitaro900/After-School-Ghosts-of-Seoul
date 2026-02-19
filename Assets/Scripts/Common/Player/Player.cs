@@ -5,8 +5,10 @@ using UnityEngine;
 public class Player : BaseChat
 {
     [Header("Move")]
+    [SerializeField] private Animator anim;
     [SerializeField] private float xMoveSpeed = 5f;
     [SerializeField] private float yMoveSpeed = 3f;
+    private Vector2 lastMoveDir = Vector2.down;
     private bool isMove = true;
 
     [Header("Item Info")]
@@ -21,6 +23,7 @@ public class Player : BaseChat
 
     private void Awake()
     {
+        anim = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
 
         if (itemChatUI != null)
@@ -50,6 +53,16 @@ public class Player : BaseChat
             moveInput.y * yMoveSpeed
         );
 
+        if (moveInput != Vector2.zero)
+        {
+            lastMoveDir = moveInput;
+            anim.SetBool("isMove", true);
+        }
+        else { anim.SetBool("isMove", false); }
+
+
+            anim.SetFloat("Xinput", lastMoveDir.x);
+        anim.SetFloat("Yinput", lastMoveDir.y);
         rb.linearVelocity = velocity;
     }
 
