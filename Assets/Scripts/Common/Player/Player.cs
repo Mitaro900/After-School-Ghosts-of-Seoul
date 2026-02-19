@@ -5,45 +5,56 @@ using UnityEngine;
 public class Player : BaseChat
 {
     [Header("Move")]
-    [SerializeField] private float xMoveSpeed = 5f; // 좌우 속도
-    [SerializeField] private float yMoveSpeed = 3f; // 상하 속도
+    [SerializeField] private float xMoveSpeed = 5f;
+    [SerializeField] private float yMoveSpeed = 3f;
     private bool isMove = true;
 
-
-    [Header("Ground Check")]
-    [SerializeField] private LayerMask groundLayer; // 체크할 땅
-
-
     [Header("Item Info")]
-    [SerializeField] private Item currentItem;  // 현재 수집한 아이템
-    [SerializeField] private GameObject itemChatUI; // 아이템 독백대사 캔버스
-    [SerializeField] private TextMeshProUGUI itemChatText;  // 독백대사 텍스트
-    private CanvasGroup itemChatCG; // 캔버스 페이드 넣을 그룹
+    [SerializeField] private Item currentItem;
+    [SerializeField] private GameObject itemChatUI;
+    [SerializeField] private TextMeshProUGUI itemChatText;
 
+    private CanvasGroup itemChatCG;
+    private NPC currentNPC;
 
-    private NPC currentNPC; // NPC 저장
-    private BoxCollider2D boxCol;   // Ground를 벗어나지 않을 콜라이더
+    private Rigidbody2D rb;
 
     private void Awake()
     {
-        boxCol = GetComponent<BoxCollider2D>();
-        itemChatCG = itemChatUI.GetComponent<CanvasGroup>();
-        GameManager.Instance.SetPlayer(this);  // 게임매니저에게 카메라 타겟을 Player로 지정
-    }
+        rb = GetComponent<Rigidbody2D>();
 
+        if (itemChatUI != null)
+            itemChatCG = itemChatUI.GetComponent<CanvasGroup>();
+        GameManager.Instance.SetPlayer(this);
+    }
 
     protected override void Update()
     {
         TalkToObject();
 
         if (isMove)
-        Move();
+            Move();
+        else
+            rb.linearVelocity = Vector2.zero;
     }
 
+    private void Move()
+    {
+        Vector2 moveInput = PlayerInputManager.Instance.moveAction.ReadValue<Vector2>();
+
+        if (moveInput.sqrMagnitude > 1f)
+            moveInput.Normalize();
+
+        Vector2 velocity = new Vector2(
+            moveInput.x * xMoveSpeed,
+            moveInput.y * yMoveSpeed
+        );
+
+        rb.linearVelocity = velocity;
+    }
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        // NPC 감지시 E키를 눌러주세요 나타남
         if (col.CompareTag("NPC"))
         {
             currentNPC = col.GetComponent<NPC>();
@@ -59,35 +70,29 @@ public class Player : BaseChat
 
     private void OnTriggerExit2D(Collider2D col)
     {
-        // NPC 감지시 E키를 눌러주세요 숨김
         if (col.CompareTag("NPC"))
         {
-            currentNPC = col.GetComponent<NPC>();
             currentNPC.HidePressEkeyUI();
             currentNPC = null;
         }
 
         if (col.CompareTag("Item"))
         {
-            currentItem = col.GetComponent<Item>();
             currentItem.HidePressEkeyUI();
+            currentItem = null;
         }
     }
 
-
     private void TalkToObject()
     {
-        // E키 누를시
         if (PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
         {
-            // NPC와 대화(움직임 차단)
             if (currentNPC != null)
             {
                 currentNPC.OnInteract(this);
                 isMove = false;
             }
 
-            // item 대화(움직임 차단은 말해보자)
             if (currentItem != null)
             {
                 string text = currentItem.GetItemPrompt();
@@ -97,64 +102,11 @@ public class Player : BaseChat
         }
     }
 
-
-
-    private void Move()
-    {
-        Vector2 moveInput = PlayerInputManager.Instance.moveAction.ReadValue<Vector2>();
-
-        if (moveInput.sqrMagnitude > 1f)    // 대각선 이동시 빠르지 1f로 고정하여 속도가 더 빠르지 않게함
-            moveInput.Normalize();
-
-        Vector3 pos = transform.position;   // 플레이어 중심 위치
-
-        Vector2 halfSize = boxCol.bounds.extents;   // 박스 콜라이더의 전체크기의 중심에서 가장자리까지의 거리
-        Vector2 boxSize = boxCol.bounds.size;   // 현재 박스 콜라이더 사이즈
-
-
-        // 좌우에 gorund가 없다면 멈춤
-        if (moveInput.x != 0)
-        {
-            float moveX = moveInput.x * xMoveSpeed * Time.deltaTime;
-            Vector3 nextPos = pos + new Vector3(moveX, 0, 0);   //  이동했을때 도착하는 중심 위치
-
-            float edgeY = boxCol.bounds.min.y;  // 박스 콜라이더 바닥 기준 (X 이동 감지는 바닥이랑 닿는지 확인)
-            Vector2 checkPos = new Vector2(nextPos.x + halfSize.x * Mathf.Sign(moveInput.x), edgeY + boxSize.y / 2f);   // 이동하려는 X 위치의 박스 콜라이더 가장자리 위치, 박스콜라이더 중심 Y 위치 (edgeY는 바닥 기준, 여기에 절반 높이를 더해 중심을 계산)
-
-            Collider2D hit = Physics2D.OverlapBox(checkPos, new Vector2(0.05f, boxSize.y), 0f, groundLayer); // 콜라이더 옆에 0.05f box를 만들어 감지시킴
-
-            if (hit != null) 
-                pos.x = nextPos.x;
-        }
-
-        // 상하에 gorund가 없다면 멈춤
-        if (moveInput.y != 0)
-        {
-            float moveY = moveInput.y * yMoveSpeed * Time.deltaTime;
-            Vector3 nextPos = pos + new Vector3(0, moveY, 0);
-
-            // 이동 방향 끝부분 체크
-            float edgeY = (moveInput.y > 0) ? boxCol.bounds.max.y : boxCol.bounds.min.y;    // 움직이는 y값에 따라 BoxCol의 y의 최대값만 가져옴 
-            Vector2 checkPos = new Vector2(nextPos.x, edgeY + 0.05f * Mathf.Sign(moveInput.y));
-
-            Collider2D hit = Physics2D.OverlapBox(checkPos, new Vector2(boxSize.x, 0.05f), 0f, groundLayer);
-
-            if (hit != null)
-                pos.y = nextPos.y;
-        }
-
-        transform.position = pos;
-    }
-
-
-    // 아이템 독백 대사 보여줌
     private IEnumerator ShowItemChat()
     {
         itemChatUI.SetActive(true);
-
         itemChatCG.alpha = 1f;
 
-        // 일정 시간 유지
         yield return new WaitForSeconds(3f);
 
         float time = 0f;
@@ -162,7 +114,7 @@ public class Player : BaseChat
         while (time < 1f)
         {
             time += Time.deltaTime;
-            itemChatCG.alpha = Mathf.Lerp(1f, 0f, time / 1f);
+            itemChatCG.alpha = Mathf.Lerp(1f, 0f, time);
             yield return null;
         }
 
@@ -171,8 +123,11 @@ public class Player : BaseChat
         itemChatCG.alpha = 1f;
     }
 
-    public void PlayerMove(bool MoveAllow)
+    public void PlayerMove(bool moveAllow)
     {
-        isMove = MoveAllow;
+        isMove = moveAllow;
+
+        if (!moveAllow)
+            rb.linearVelocity = Vector2.zero;
     }
 }
