@@ -196,7 +196,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -1355206381
+  m_SortingLayerID: -1939207217
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
@@ -1180,7 +1180,6 @@ MonoBehaviour:
   Sad: {fileID: -4895031709328906302, guid: 6e882c49e6f6859479359ac520f1dfa1, type: 3}
   npcData: {fileID: 11400000, guid: 0b8c3a63b3f5ba349965dbb48a32b3f9, type: 2}
   pressE: {fileID: 1181999474}
-  isChatActive: 0
 --- !u!61 &1506125719
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1327,8 +1326,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -1832948835
-  m_SortingLayer: 4
+  m_SortingLayerID: -1939207217
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -7081404512699209381, guid: 7567aa16b4b498d4ea9ba95ea4ff9973, type: 3}
@@ -1461,8 +1460,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   currentItem: {fileID: 0}
+  itemChatUI: {fileID: 0}
   itemChatText: {fileID: 0}
-  iemChatUI: {fileID: 0}
 --- !u!50 &1643047814
 Rigidbody2D:
   serializedVersion: 5

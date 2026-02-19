@@ -43,7 +43,7 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: BackGrond
+  - name: BackGround
     uniqueID: 4071387475
     locked: 0
   - name: Object
