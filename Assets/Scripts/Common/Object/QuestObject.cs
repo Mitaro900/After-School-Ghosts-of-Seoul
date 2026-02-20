@@ -28,24 +28,24 @@ public class QuestObject : MonoBehaviour
 
     public virtual string GetItemPrompt()
     {
-        // 퀘스트 전일시
-        if (QuestManager.Instance.GetQuestState(questItem) == QuestState.NotStarted)
-        {
-            currentChat = questNotStarted;
-        }
+        //// 퀘스트 전일시
+        //if (QuestManager.Instance.GetQuestState(questItem) == QuestState.NotStarted)
+        //{
+        //    currentChat = questNotStarted;
+        //}
 
-        // 퀘스트 중일시
-        if (QuestManager.Instance.GetQuestState(questItem) == QuestState.Completed)
-        {
-            currentChat = questInProgress;
-        }
+        //// 퀘스트 중일시
+        //if (QuestManager.Instance.GetQuestState(questItem) == QuestState.Completed)
+        //{
+        //    currentChat = questInProgress;
+        //}
 
-        // 퀘스트 완료시
-        if (QuestManager.Instance.GetQuestState(questItem) == QuestState.Completed)
-        {
-            currentChat = questCompleted;
-            Destroy(gameObject);
-        }
+        //// 퀘스트 완료시
+        //if (QuestManager.Instance.GetQuestState(questItem) == QuestState.Completed)
+        //{
+        //    currentChat = questCompleted;
+        //    Destroy(gameObject);
+        //}
         return currentChat;
     }
 }

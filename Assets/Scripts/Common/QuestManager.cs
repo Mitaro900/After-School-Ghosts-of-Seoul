@@ -11,54 +11,96 @@ public enum QuestState
 
 public class QuestManager : Singleton<QuestManager>
 {
-    [SerializeField] private List<ItemData> allItem;
+    [SerializeField] private List<QuestData> allQuests; // 모든 퀘스트 등록 (위치 정해지면 자동으로 모두 등록하게 해보기)
 
-    private Dictionary<string, QuestState> questStates = new();
-    private Dictionary<string, ItemData> questDatabase = new();
+    private Dictionary<string, QuestData> questDatabase = new();    // questId → QuestData (퀘스트 정보 저장)
+    private Dictionary<string, QuestState> questStates = new();     // questId → 현재 퀘스트 상태
+
 
     protected override void Awake()
     {
         base.Awake();
-        InitializeQuests();
+        InitializeQuests(); // 게임 시작 시 퀘스트 초기화
     }
 
 
-    // 퀘스트 스타트 (퀘스트 중으로 만듬)
-    public void StartQuest(ItemData item)
+    // 모든 퀘스트를 NotStarted 상태로 초기화
+    private void InitializeQuests()
     {
-        questStates[item.ItemName] = QuestState.InProgress;
+        foreach (var quest in allQuests)
+        {
+            // 중복 등록 방지
+            if (!questStates.ContainsKey(quest.questId))
+            {
+                questStates.Add(quest.questId, QuestState.NotStarted);
+                questDatabase.Add(quest.questId, quest);
+            }
+        }
     }
 
 
-    // 퀘스트 완료 (퀘스트 완료로 만듬)
-    public void CompleteQuest(ItemData item)
+    // 퀘스트 현재 상태 반환
+    public QuestState GetQuestState(string questId)
     {
-        questStates[item.ItemName] = QuestState.Completed;
-
-        ItemData quest = questDatabase[item.ItemName];
-    }
-
-
-    // 퀘스트가 완료되었는지 확인
-    public QuestState GetQuestState(ItemData item)
-    {
-        if (questStates.ContainsKey(item.ItemName))
-            return questStates[item.ItemName];
+        if (questStates.TryGetValue(questId, out var state))
+            return state;
 
         return QuestState.NotStarted;
     }
 
 
-    // 모든 퀘스트 아이템 적용
-    private void InitializeQuests()
+    // 퀘스트 시작 (NotStarted → InProgress)
+    public void StartQuest(string questId)
     {
-        foreach (var quest in allItem)
+        if (!questStates.ContainsKey(questId))
+            return;
+
+        questStates[questId] = QuestState.InProgress;
+    }
+
+
+    // 퀘스트 완료 처리 (InProgress → Completed)
+    public void CompleteQuest(string questId)
+    {
+        if (!questDatabase.TryGetValue(questId, out var quest))
+            return;
+
+        questStates[questId] = QuestState.Completed;
+
+
+        // 인벤토리에 아이템 지급 (보상 활성화시)
+        if (quest.givesReward)
         {
-            if (!questStates.ContainsKey(quest.ItemName))
-            {
-                questStates.Add(quest.ItemName, QuestState.NotStarted);
-                questDatabase.Add(quest.ItemName, quest);
-            }
+            GiveReward(quest);
         }
+    }
+
+
+    // 보상 아이템 지급
+    private void GiveReward(QuestData quest)
+    {
+        foreach (var reward in quest.rewardItems)
+        {
+            //InventoryManager.Instance.AddItem(reward);
+        }
+    }
+
+
+    // 퀘스트 완료 조건 체크 (완료 조건 아이템을 가지고 있는지 검사)
+    public bool CheckQuestComplete(string questId)
+    {
+        if (!questDatabase.ContainsKey(questId))
+            return false;
+
+        var quest = questDatabase[questId];
+
+        foreach (var item in quest.requiredItems)
+        {
+            // 인벤토리에 아이템이 없으면 완료 불가
+            //if (!InventoryManager.Instance.HasItem(item))
+            //    return false;
+        }
+
+        return true; // 모든 조건 충족
     }
 }
