@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class QuestObject : MonoBehaviour
 {
-    [SerializeField] protected ItemData questItem;
+    [SerializeField] protected QuestData questData;
     [SerializeField] protected GameObject pressE;
 
     [Header("Quest Chat")]
-    [SerializeField] protected string questNotStarted = "문을 열려면 아이템이 필요하겠어";
-    [SerializeField] protected string questInProgress = "이 문을 열려면 먼저 NPC의 부탁을 들어줘야 할 것 같아";
+    [SerializeField] protected string questNotStarted = "문이 잠겨있다. 누군가가 알고있을지도";
+    [SerializeField] protected string questInProgress = "이 문을 열려면 아이템을 찾아야 될 것 같아";
     [SerializeField] protected string questCompleted = "문이 열렸다.";
     private string currentChat;
 
@@ -28,24 +28,27 @@ public class QuestObject : MonoBehaviour
 
     public virtual string GetItemPrompt()
     {
-        //// 퀘스트 전일시
-        //if (QuestManager.Instance.GetQuestState(questItem) == QuestState.NotStarted)
-        //{
-        //    currentChat = questNotStarted;
-        //}
+        // 퀘스트 전일시
+        if (QuestManager.Instance.GetQuestState(questData.questId) == QuestState.NotStarted)
+        {
+            currentChat = questNotStarted;
+        }
 
-        //// 퀘스트 중일시
-        //if (QuestManager.Instance.GetQuestState(questItem) == QuestState.Completed)
-        //{
-        //    currentChat = questInProgress;
-        //}
+        // 퀘스트 중일시
+        if (QuestManager.Instance.GetQuestState(questData.questId) == QuestState.InProgress)
+        {
+            // 아이템 조건 검사후 퀘스트 완료시
+            if (QuestManager.Instance.CheckQuestComplete(questData.questId))
+            {
+                currentChat = questCompleted;
+                Destroy(gameObject);
+            }
+            else // 조건 불일치시
+            {
+                currentChat = questInProgress;
+            }
+        }
 
-        //// 퀘스트 완료시
-        //if (QuestManager.Instance.GetQuestState(questItem) == QuestState.Completed)
-        //{
-        //    currentChat = questCompleted;
-        //    Destroy(gameObject);
-        //}
         return currentChat;
     }
 }
