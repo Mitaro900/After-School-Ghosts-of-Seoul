@@ -31,7 +31,16 @@ public class QuestObject : MonoBehaviour
         // 퀘스트 전일시
         if (QuestManager.Instance.GetQuestState(questData.questId) == QuestState.NotStarted)
         {
-            currentChat = questNotStarted;
+            // 아이템 조건 검사후 퀘스트 완료시
+            if (QuestManager.Instance.CheckQuestComplete(questData.questId))    // 이 부분은 생각 더 해보셈 바빠서 이것만 적어놈
+            {
+                currentChat = questCompleted;
+                Destroy(gameObject);
+            }
+            else
+            {
+                currentChat = questNotStarted;
+            }
         }
 
         // 퀘스트 중일시
@@ -45,6 +54,7 @@ public class QuestObject : MonoBehaviour
             }
             else // 조건 불일치시
             {
+                Debug.Log("다른 퀘스트임");
                 currentChat = questInProgress;
             }
         }

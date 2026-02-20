@@ -102,10 +102,10 @@ public class InventoryManager : Singleton<InventoryManager>
     {
         foreach (var item in items)
         {
-            if (!HasItem(item))
-                return false;
+            if (HasItem(item))
+                return true;
         }
-        return true;
+        return false;
     }
 
     public bool HasItem(ItemData item)
