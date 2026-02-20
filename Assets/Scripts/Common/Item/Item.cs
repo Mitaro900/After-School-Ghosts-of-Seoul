@@ -22,15 +22,15 @@ public class Item : MonoBehaviour
 
     public string GetItemPrompt()
     {
-        // 퀘스트가 아닐경우 퀘스트 바로 완료 처리
-        if (!isQuest)
-        {
-            QuestManager.Instance.CompleteQuest(itemData);
-        }
-        else
-        {
-            QuestManager.Instance.StartQuest(itemData);
-        }
+        //// 퀘스트가 아닐경우 퀘스트 바로 완료 처리
+        //if (!isQuest)
+        //{
+        //    QuestManager.Instance.CompleteQuest(itemData);
+        //}
+        //else
+        //{
+        //    QuestManager.Instance.StartQuest(itemData);
+        //}
 
         Destroy(gameObject);
         return itemData.ItemPrompt;
