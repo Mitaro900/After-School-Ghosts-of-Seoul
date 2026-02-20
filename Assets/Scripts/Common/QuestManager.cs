@@ -19,6 +19,7 @@ public class QuestManager : Singleton<QuestManager>
     private Dictionary<string, string> questStep = new();           // questId -> currentStepId (단계형)
     private HashSet<string> doneSteps = new();                      // 완료한 step 기록 (재수행 방지)
 
+    private string testquestId;
 
     protected override void Awake()
     {
@@ -45,6 +46,7 @@ public class QuestManager : Singleton<QuestManager>
     // 퀘스트 현재 상태
     public QuestState GetQuestState(string questId)
     {
+        testquestId = questId;
         if (questStates.TryGetValue(questId, out var state))
             return state;
 
@@ -59,6 +61,8 @@ public class QuestManager : Singleton<QuestManager>
             return;
 
         questStates[questId] = QuestState.InProgress;
+
+        Debug.Log($"[QuestManager] 퀘스트 '{questId}' 상태 변경: {questStates[questId]}");
     }
 
 
@@ -69,7 +73,7 @@ public class QuestManager : Singleton<QuestManager>
             return;
 
         questStates[questId] = QuestState.Completed;
-
+        Debug.Log($"[QuestManager] 퀘스트 '{questId}' 상태 변경: {questStates[questId]}");
 
         // 인벤토리에 아이템 지급 (보상 활성화시)
         if (quest.givesReward)
@@ -77,7 +81,12 @@ public class QuestManager : Singleton<QuestManager>
             GiveReward(quest);
         }
     }
-
+    public QuestState GetQuestStateWithDebug(string questId)
+    {
+        var state = GetQuestState(questId);
+        Debug.Log($"[QuestManager] 퀘스트 '{questId}' 현재 상태: {state}");
+        return state;
+    }
 
     // 보상 아이템 지급
     private void GiveReward(QuestData quest)
@@ -106,6 +115,53 @@ public class QuestManager : Singleton<QuestManager>
         CompleteQuest(questId);
         return true;
     }
+
+
+    // 상태별 NPC 대사 가져오기
+    public string GetQuestNpcPrompt(string questId)
+    {
+        if (!questDatabase.ContainsKey(questId))
+            return "";
+
+        var quest = questDatabase[questId];
+        var state = GetQuestState(questId);
+
+        switch (state)
+        {
+            case QuestState.NotStarted:
+                return quest.questNotStarted;
+
+            case QuestState.InProgress:
+                return quest.questInProgress;
+
+            case QuestState.Completed:
+                return quest.questAfterComplete;
+        }
+
+        return "";
+    }
+
+
+    // 완료 직후 전용 대사
+    public string GetQuestCompleteDialogue(string questId)
+    {
+        if (!questDatabase.ContainsKey(questId))
+            return "";
+
+        return questDatabase[questId].questOnComplete;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public enum StepResultType
     {

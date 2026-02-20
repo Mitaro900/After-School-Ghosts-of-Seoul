@@ -10,7 +10,7 @@ public class QuestData : ScriptableObject
 
 
     [Header("NPC 대화 - 상태별")]
-    [TextArea] public string questOnStart;      // 퀘스트 처음 받을 때
+    [TextArea] public string questNotStarted;   // 퀘스트 시작전
     [TextArea] public string questInProgress;   // 진행 중일 때 말걸면
     [TextArea] public string questOnComplete;   // 완료 조건 충족 시
     [TextArea] public string questAfterComplete;// 완료 이후 다시 말걸면

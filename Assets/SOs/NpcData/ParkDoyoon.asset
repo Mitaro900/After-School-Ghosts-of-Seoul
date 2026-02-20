@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ParkDoyoon
   m_EditorClassIdentifier: Assembly-CSharp::NpcData
   npcName: "\uBC15\uB3C4\uC724"
+  relatedQuest: {fileID: 11400000, guid: 70146c638c6625e4bb46808a827d80d7, type: 2}
   npcPrompt: "\uB2F9\uC2E0\uC740 \uC8FC\uC778\uACF5\uC758 \uCE5C\uAD6C '\uBC15\uB3C4\uC724'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uC0AC\uAD50\uC801\uC774\uC9C0\uB9CC \uB208\uCE58\uAC00 \uBE60\uB984\r\n- \uD45C\uC815
     \uBCC0\uD654\uAC00 \uB9CE\uACE0, \uD559\uAD50 \uC0DD\uD65C, \uB3D9\uC544\uB9AC
