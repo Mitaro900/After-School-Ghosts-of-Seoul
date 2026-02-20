@@ -4175,7 +4175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a126c85ede8a7d54d85cf689eebb25d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuestObject
-  questData: {fileID: 11400000, guid: ad661969834a63843adee13a0400c7c1, type: 2}
+  questData: {fileID: 11400000, guid: 70146c638c6625e4bb46808a827d80d7, type: 2}
   pressE: {fileID: 1798885113}
   questNotStarted: "\uBB38\uC744 \uC5F4\uB824\uBA74 \uC544\uC774\uD15C\uC774 \uD544\uC694\uD558\uACA0\uC5B4"
   questInProgress: "\uC774 \uBB38\uC744 \uC5F4\uB824\uBA74 \uBA3C\uC800 NPC\uC758
@@ -7850,7 +7850,7 @@ PrefabInstance:
     - target: {fileID: 8046407437711900487, guid: f36e60c94dc6df44291efaa41238313f, type: 3}
       propertyPath: 'allQuests.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: ad661969834a63843adee13a0400c7c1, type: 2}
+      objectReference: {fileID: 11400000, guid: 70146c638c6625e4bb46808a827d80d7, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

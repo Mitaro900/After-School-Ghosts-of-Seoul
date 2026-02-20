@@ -1,9 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static QuestManager;
 
 public enum EmotionType
 {
@@ -133,20 +135,20 @@ public class ChatUI : UIBase
         ChatLogManager.Instance.AddLine(true, playerText);
 
         // 2) 서버 요청(플레이어 타이핑 끝난 뒤)
-        string reply = null;
+        ChatResponse reply = null;
         yield return StartCoroutine(OpenAIManager.Instance.SendMessage(
             playerText,
             npc.NpcData.NpcPrompt,
             r => reply = r
         ));
 
-        if (string.IsNullOrWhiteSpace(reply))
-            reply = "죄송합니다, 응답을 받지 못했습니다.";
+        if (string.IsNullOrWhiteSpace(reply.text))
+            reply.text = "죄송합니다, 응답을 받지 못했습니다.";
 
         // 3) NPC 말풍선 타이핑(끝날 때까지)
         var nBubble = CreateBubble(isPlayer: false);
-        yield return StartCoroutine(TypeText(nBubble, reply, false, npc, typingSpeed));
-        ChatLogManager.Instance.AddLine(false, reply);
+        yield return StartCoroutine(TypeText(nBubble, reply.text, false, npc, typingSpeed));
+        ChatLogManager.Instance.AddLine(false, reply.text);
 
         EndBusy();
     }

@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3bcdde247966344392b7cac38a82d3a, type: 3}
-  m_Name: QuestData
+  m_Name: TestQuestData
   m_EditorClassIdentifier: Assembly-CSharp::QuestData
-  questId: beta1-1
-  questName: "\uC5F4\uC1E0\uB97C \uCC3E\uC790"
-  questOnStart: 
-  questInProgress: 
-  questOnComplete: 
-  questAfterComplete: 
+  questId: test1
+  questName: "\uC5F4\uC1E0\uB97C \uCC3E\uC544\uB77C"
+  questOnStart: "\uD018\uC2A4\uD2B8 \uC2DC\uC791"
+  questInProgress: "\uD018\uC2A4\uD2B8 \uC9C4\uD589"
+  questOnComplete: "\uD018\uC2A4\uD2B8 \uC644\uB8CC"
+  questAfterComplete: "\uBB38\uC774 \uC5F4\uB838\uB2E4!"
   requiredItems:
   - {fileID: 11400000, guid: 6a3cc922739527f49b14b9786e1dfa4a, type: 2}
   givesReward: 0

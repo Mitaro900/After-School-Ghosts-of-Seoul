@@ -32,7 +32,7 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
     }
     #endregion
 
-    public IEnumerator SendMessage(string userMessage, string npcPrompt, System.Action<string> onComplete)
+    public IEnumerator SendMessage(string userMessage, string npcPrompt, System.Action<ChatResponse> onComplete)
     {
         var requestData = new ChatRequest
         {
@@ -52,7 +52,6 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
 
             request.SetRequestHeader("Content-Type", "application/json");
 
-            // OpenAI Authorization 헤더 삭제! (키는 서버에만)
             if (!string.IsNullOrEmpty(appToken))
                 request.SetRequestHeader("X-App-Token", appToken);
 
@@ -63,21 +62,22 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
 
             if (request.result == UnityWebRequest.Result.Success && httpOk)
             {
-                var response = JsonUtility.FromJson<ChatResponse>(raw);
+                ChatResponse response = null;
+                try { response = JsonUtility.FromJson<ChatResponse>(raw); } catch { }
 
-                if (string.IsNullOrEmpty(response?.text))
-                {
-                    Debug.LogError("Malformed success response from proxy:\n" + raw);
-                    onComplete?.Invoke("죄송합니다, 응답을 처리하지 못했습니다.");
-                    yield break;
-                }
+                if (response == null)
+                    response = new ChatResponse { text = "응답 파싱 실패", choices = System.Array.Empty<Choice>() };
 
-                onComplete?.Invoke(response.text);
+                if (response.choices == null) response.choices = System.Array.Empty<Choice>();
+                if (string.IsNullOrWhiteSpace(response.text))
+                    response.text = "죄송합니다, 응답을 처리하지 못했습니다.";
+
+                onComplete?.Invoke(response);
             }
             else
             {
                 Debug.LogError($"Proxy Error: {request.responseCode} {request.error}\nURL: {API_URL}\n{raw}");
-                onComplete?.Invoke("죄송합니다, 응답을 받지 못했습니다.");
+                onComplete?.Invoke(new ChatResponse { text = "죄송합니다, 응답을 받지 못했습니다.", choices = System.Array.Empty<Choice>() });
             }
         }
     }
@@ -94,5 +94,12 @@ public class ChatRequest
 public class ChatResponse
 {
     public string text;
-    // public object raw; // 서버가 raw까지 주는데 Unity에서 굳이 받을 필요 없으면 생략
+    public Choice[] choices;
+}
+
+[System.Serializable]
+public class Choice
+{
+    public string id;
+    public string label;
 }
