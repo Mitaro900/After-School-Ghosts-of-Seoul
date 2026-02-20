@@ -137,6 +137,13 @@ public class Player : BaseChat
         }
     }
 
+    // InventoryManager에서 슬롯 클릭시 사용함
+    public void TalkToSlotItem(string text)
+    {
+        itemChatText.text = text;
+        PlayItemChat();
+    }
+
     public void PlayItemChat()
     {
         if (itemChatCoroutine != null)

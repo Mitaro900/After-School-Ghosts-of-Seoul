@@ -1,6 +1,7 @@
 using NUnit.Framework.Interfaces;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public enum QuestState
 {
@@ -39,7 +40,7 @@ public class QuestManager : Singleton<QuestManager>
     }
 
 
-    // 퀘스트 현재 상태 반환
+    // 퀘스트 현재 상태
     public QuestState GetQuestState(string questId)
     {
         if (questStates.TryGetValue(questId, out var state))
@@ -81,7 +82,7 @@ public class QuestManager : Singleton<QuestManager>
     {
         foreach (var reward in quest.rewardItems)
         {
-            //InventoryManager.Instance.AddItem(reward);
+            InventoryManager.Instance.AddItem(reward);
         }
     }
 
@@ -94,13 +95,13 @@ public class QuestManager : Singleton<QuestManager>
 
         var quest = questDatabase[questId];
 
-        foreach (var item in quest.requiredItems)
-        {
-            // 인벤토리에 아이템이 없으면 완료 불가
-            //if (!InventoryManager.Instance.HasItem(item))
-            //    return false;
-        }
+        // 전체 조건 한 번만 검사
+        if (!InventoryManager.Instance.HasAllItems(quest.requiredItems))
+            return false;
 
-        return true; // 모든 조건 충족
+        // 조건 만족 시 해당 아이템들 제거, 퀘스트 완료 처리
+        InventoryManager.Instance.RemoveItems(quest.requiredItems);
+        CompleteQuest(questId);
+        return true;
     }
 }

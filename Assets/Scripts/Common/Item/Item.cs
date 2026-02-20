@@ -3,7 +3,6 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
     [SerializeField] ItemData itemData;
-    [SerializeField] bool isQuest = false;
     [SerializeField] protected GameObject pressE;
     [SerializeField] protected GameObject outLine;
 
@@ -20,19 +19,12 @@ public class Item : MonoBehaviour
         outLine.SetActive(false);
     }
 
+    // 획득시 플레이어가 퀘스트 관련 대사 (ex 이 아이템을 누군가에게 전해주자)
     public string GetItemPrompt()
     {
-        //// 퀘스트가 아닐경우 퀘스트 바로 완료 처리
-        //if (!isQuest)
-        //{
-        //    QuestManager.Instance.CompleteQuest(itemData);
-        //}
-        //else
-        //{
-        //    QuestManager.Instance.StartQuest(itemData);
-        //}
+        InventoryManager.Instance.AddItem(itemData);    // 아이템 슬롯에 등록
 
         Destroy(gameObject);
-        return itemData.ItemPrompt;
+        return itemData.ItemQuestPrompt;
     }
 }

@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23b82b5bf21e3684a92edcac62c6cf2c, type: 3}
   m_Name: ItemData
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "\u3134\u3139\u3147"
-  itemPrompt: "\u3147\u3139\u3147\u3139\u3147\u3139"
+  itemName: "\uC5F4\uC1E0"
+  itemImage: {fileID: 0}
+  itemQuestPrompt: "\uAE38\uBC14\uB2E5\uC5D0 \uBC84\uB824\uC9C4 \uC5F4\uC1E0\uB77C\uB2C8.."
+  itemSlotPrompt: "\uC774 \uC5F4\uC1E0\uB85C \uC624\uB978\uCABD \uBB38\uC744 \uC5F4
+    \uC218 \uC788\uACA0\uC5B4"

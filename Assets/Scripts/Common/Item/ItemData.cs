@@ -4,9 +4,13 @@ using UnityEngine;
 public class ItemData : ScriptableObject
 {
     [SerializeField] private string itemName;
-    [SerializeField][TextArea] private string itemPrompt;
+    [SerializeField] private Sprite itemImage;
+    [SerializeField][TextArea] private string itemQuestPrompt;
+    [SerializeField][TextArea] private string itemSlotPrompt;
 
 
     public string ItemName => itemName;
-    public string ItemPrompt => itemPrompt;
+    public Sprite ItemImage => itemImage;
+    public string ItemQuestPrompt => itemQuestPrompt;
+    public string ItemSlotPrompt => itemSlotPrompt;
 }
