@@ -133,7 +133,16 @@ public class ChatUI : UIBase
         ChatLogManager.Instance.AddLine(true, playerText);
 
         // 2) 퀘스트 정보 가져오기
-        string questId = npc.NpcData.RelatedQuest.questId;
+        var quest = QuestManager.Instance.GetAvailableQuest(npc);
+
+        if (quest == null)
+        {
+            EndBusy();
+            yield break;
+        }
+
+        string questId = quest.questId;
+
         if (string.IsNullOrEmpty(questId))
         {
             EndBusy();

@@ -56,8 +56,6 @@ public class ChatLogManager : Singleton<ChatLogManager>
     {
         if (currentSession == null) return; // 세션이 없으면 무시
 
-        Debug.Log("대화 한줄 추가");
-
         // 현재 세션에 한 줄 대화 추가
         currentSession.lines.Add(new DialogueLine(isPlayer, message));
     }
@@ -65,7 +63,6 @@ public class ChatLogManager : Singleton<ChatLogManager>
     // 대화 종료
     public void EndSession()
     {
-        Debug.Log("대화종료");
         if (currentSession == null) return; // 세션이 없으면 무시
 
         // Dictionary에서 NPC의 세션 리스트에 추가

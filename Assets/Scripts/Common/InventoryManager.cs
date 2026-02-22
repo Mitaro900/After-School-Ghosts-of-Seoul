@@ -55,6 +55,9 @@ public class InventoryManager : Singleton<InventoryManager>
             {
                 slot.itemData = newItem;
                 RefreshUI();
+
+                QuestManager.Instance.CheckQuestComplete(newItem.ItemName);
+
                 return true;
             }
         }
@@ -63,7 +66,7 @@ public class InventoryManager : Singleton<InventoryManager>
     }
 
 
-    // 아이템 제거 (QuestManager에서 사용)
+    // 아이템 제거
     public void RemoveItems(List<ItemData> items)
     {
         foreach (var item in items)

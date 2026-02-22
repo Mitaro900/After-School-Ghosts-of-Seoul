@@ -12,121 +12,190 @@ public enum QuestState
 
 public class QuestManager : Singleton<QuestManager>
 {
-    [SerializeField] private List<QuestData> allQuests; // 모든 퀘스트 등록 (위치 정해지면 자동으로 모두 등록하게 해보기)
+    // 인스펙터에 등록하는 전체 퀘스트 목록
+    [Header("퀘스트 목록")]
+    [SerializeField] private List<QuestData> allQuests;
 
-    private Dictionary<string, QuestData> questDatabase = new();    // questId → QuestData (퀘스트 정보 저장)
-    private Dictionary<string, QuestState> questStates = new();     // questId → 현재 퀘스트 상태
-    private Dictionary<string, string> questStep = new();           // questId -> currentStepId (단계형)
-    private HashSet<string> doneSteps = new();                      // 완료한 step 기록 (재수행 방지)
+    // questId → QuestData 빠른 검색용
+    private Dictionary<string, QuestData> questDatabase = new();
 
-    private string testquestId;
+    // questId → 현재 퀘스트 상태 저장
+    private Dictionary<string, QuestState> questStates = new();
 
+    // 현재 진행 중인 퀘스트 목록
+    private List<QuestData> activeQuests = new();
+
+    #region 초기화
+
+    // 전체 퀘스트를 Dictionary에 등록
     protected override void Awake()
     {
         base.Awake();
-        InitializeQuests(); // 게임 시작 시 퀘스트 초기화
-    }
 
-
-    // 모든 퀘스트를 NotStarted 상태로 초기화
-    private void InitializeQuests()
-    {
         foreach (var quest in allQuests)
         {
-            // 중복 등록 방지
-            if (!questStates.ContainsKey(quest.questId))
-            {
-                questStates.Add(quest.questId, QuestState.NotStarted);
+            if (!questDatabase.ContainsKey(quest.questId))
                 questDatabase.Add(quest.questId, quest);
+        }
+    }
+
+    #endregion
+
+
+    #region 상태 조회
+
+    // 퀘스트 상태 반환 (없으면 NotStarted로 초기화)
+    public QuestState GetQuestState(string questId)
+    {
+        if (!questStates.ContainsKey(questId))
+            questStates[questId] = QuestState.NotStarted;
+
+        return questStates[questId];
+    }
+
+    #endregion
+
+
+    #region 퀘스트 찾기
+
+    // questId로 등록된 퀘스트가 있는지 검색
+    private QuestData FindQuestById(string questId)
+    {
+        // 등록된 퀘스트가 있다면 퀘스트 전송
+        if (questDatabase.TryGetValue(questId, out var quest))
+            return quest;   
+
+        return null;
+    }
+
+    #endregion
+
+
+    #region 퀘스트 시작
+
+    // 퀘스트 시작 처리
+    public void StartQuest(string questId)
+    {
+        // 등록된 퀘스트가 있는지 검색하고 저장
+        var quest = FindQuestById(questId);
+        if (quest == null) return;
+
+        // 퀘스트를 퀘스트 중으로 바꿈
+        questStates[questId] = QuestState.InProgress;
+
+        // 이미 진행 중 목록에 들어있는 퀘스트면 또 추가하지 않음
+        if (!activeQuests.Contains(quest))
+            activeQuests.Add(quest);
+
+        Debug.Log($"퀘스트 시작: {quest.questName}");
+    }
+
+    #endregion
+
+
+    #region NPC 아이템 조건 
+
+    // NPC와 대화했을 때 완료 가능한지 검사
+    public bool CheckQuestComplete(string questId)
+    {
+        // 등록된 퀘스트가 있는지 검색하고 저장
+        var quest = FindQuestById(questId);
+        if (quest == null)
+            return false;
+
+        // 퀘스트가 진행 중이 아니면 실패
+        if (GetQuestState(questId) != QuestState.InProgress)
+            return false;
+
+        // 아이템 조건이 있다면 검사
+        if (quest.requiredItem != null)
+        {
+            if (!InventoryManager.Instance.HasItem(quest.requiredItem))
+                return false;
+        }
+
+        // 조건 만족 시 완료 처리
+        CompleteQuest(quest);
+        return true;
+    }
+
+    #endregion
+
+
+    #region NPC 대화 조건 (특정 NPC 방문형)
+
+    // 특정 NPC와 대화 시 완료되는 퀘스트 처리
+    public void CheckTalkCondition(NPC npc)
+    {
+        foreach (var quest in new List<QuestData>(activeQuests))
+        {
+            if (quest.targetNpc == npc)
+            {
+                CompleteQuest(quest);
             }
         }
     }
 
+    #endregion
 
-    // 퀘스트 현재 상태
-    public QuestState GetQuestState(string questId)
+
+    #region 완료 처리
+
+    // 실제 퀘스트 완료 처리
+    public void CompleteQuest(QuestData quest)
     {
-        testquestId = questId;
-        if (questStates.TryGetValue(questId, out var state))
-            return state;
+        questStates[quest.questId] = QuestState.Completed;
+        activeQuests.Remove(quest);
 
-        return QuestState.NotStarted;
-    }
-
-
-    // 퀘스트 시작 (NotStarted → InProgress)
-    public void StartQuest(string questId)
-    {
-        if (!questStates.ContainsKey(questId))
-            return;
-
-        questStates[questId] = QuestState.InProgress;
-
-        Debug.Log($"[QuestManager] 퀘스트 '{questId}' 상태 변경: {questStates[questId]}");
-    }
-
-
-    // 퀘스트 완료 처리 (InProgress → Completed)
-    public void CompleteQuest(string questId)
-    {
-        if (!questDatabase.TryGetValue(questId, out var quest))
-            return;
-
-        questStates[questId] = QuestState.Completed;
-        Debug.Log($"[QuestManager] 퀘스트 '{questId}' 상태 변경: {questStates[questId]}");
-
-        // 인벤토리에 아이템 지급 (보상 활성화시)
+        // 보상 지급
         if (quest.givesReward)
         {
-            GiveReward(quest);
+            foreach (var item in quest.rewardItems)
+                InventoryManager.Instance.AddItem(item);
         }
-    }
-    public QuestState GetQuestStateWithDebug(string questId)
-    {
-        var state = GetQuestState(questId);
-        Debug.Log($"[QuestManager] 퀘스트 '{questId}' 현재 상태: {state}");
-        return state;
+
+        Debug.Log($"퀘스트 완료: {quest.questName}");
     }
 
-    // 보상 아이템 지급
-    private void GiveReward(QuestData quest)
+    #endregion
+
+
+    #region NPC용 인터페이스
+
+    // NPC가 현재 줄 수 있는 퀘스트 반환
+    public QuestData GetAvailableQuest(NPC npc)
     {
-        foreach (var reward in quest.rewardItems)
+        if (npc == null) return null;
+
+        foreach (var quest in npc.NpcData.RelatedQuests)
         {
-            InventoryManager.Instance.AddItem(reward);
+            var state = GetQuestState(quest.questId);
+
+            // 아직 완료 안 된 첫 번째 퀘스트 반환
+            if (state != QuestState.Completed)
+                return quest;
         }
+
+        return null;
     }
+    #endregion
 
 
-    // 퀘스트 완료 조건 체크 (완료 조건 아이템을 가지고 있는지 검사)
-    public bool CheckQuestComplete(string questId)
+    #region 유틸
+
+    // 현재 진행 중인 퀘스트 목록 반환
+    public List<QuestData> GetActiveQuests()
     {
-        if (!questDatabase.ContainsKey(questId))
-            return false;
-
-        var quest = questDatabase[questId];
-
-        // 전체 조건 한 번만 검사
-        if (!InventoryManager.Instance.HasAllItems(quest.requiredItems))
-            return false;
-
-        // 조건 만족 시 해당 아이템들 제거, 퀘스트 완료 처리
-        InventoryManager.Instance.RemoveItems(quest.requiredItems);
-        CompleteQuest(questId);
-        return true;
+        return activeQuests;
     }
 
-
-    // 상태별 NPC 대사 가져오기
+    // NPC 대사 분기용
     public string GetQuestNpcPrompt(string questId)
     {
-        if (!questDatabase.ContainsKey(questId))
-            return "";
+        var quest = FindQuestById(questId);
+        if (quest == null) return "";
 
-        var quest = questDatabase[questId];
-        var state = GetQuestState(questId);
-
-        switch (state)
+        switch (GetQuestState(questId))
         {
             case QuestState.NotStarted:
                 return quest.questNotStarted;
@@ -141,15 +210,7 @@ public class QuestManager : Singleton<QuestManager>
         return "";
     }
 
-
-    // 완료 직후 전용 대사
-    public string GetQuestCompleteDialogue(string questId)
-    {
-        if (!questDatabase.ContainsKey(questId))
-            return "";
-
-        return questDatabase[questId].questOnComplete;
-    }
+    #endregion
 
 
 
@@ -182,28 +243,28 @@ public class QuestManager : Singleton<QuestManager>
     public StepResult TryPerformStep(string questId, string stepId, string npcId)
     {
         // 1) 퀘스트 존재
-        if (!questDatabase.ContainsKey(questId))
-            return new StepResult { type = StepResultType.Fail_NotFound, message = "Quest not found" };
+        //if (!questDatabase.ContainsKey(questId))
+        //    return new StepResult { type = StepResultType.Fail_NotFound, message = "Quest not found" };
 
         // 2) 상태 확인
         if (GetQuestState(questId) != QuestState.InProgress)
             return new StepResult { type = StepResultType.Fail_NotInProgress, message = "Quest not in progress" };
 
         // 3) 이미 완료한 step인지
-        var key = $"{questId}:{stepId}";
-        if (doneSteps.Contains(key))
-            return new StepResult { type = StepResultType.Fail_AlreadyDone, message = "Step already done" };
+        //var key = $"{questId}:{stepId}";
+        //if (doneSteps.Contains(key))
+        //    return new StepResult { type = StepResultType.Fail_AlreadyDone, message = "Step already done" };
 
         // 4) 현재 step과 일치하는지(단계형일 때)
-        if (questStep.TryGetValue(questId, out var cur) && !string.IsNullOrEmpty(cur) && cur != stepId)
-            return new StepResult { type = StepResultType.Fail_WrongStep, message = $"Current step is {cur}" };
+        //if (questStep.TryGetValue(questId, out var cur) && !string.IsNullOrEmpty(cur) && cur != stepId)
+        //    return new StepResult { type = StepResultType.Fail_WrongStep, message = $"Current step is {cur}" };
 
         // 5) 조건 검사(예: 증거 아이템 보유, npcId 일치 등)
         // 예: ShowEvidence step이면 InventoryManager.HasItem(...) 체크 등
         // if (!InventoryManager.Instance.HasItem("EVIDENCE_001")) return Fail_ConditionNotMet;
 
         // 6) 성공 처리: step 완료 기록 + 다음 step으로 전이(혹은 완료)
-        doneSteps.Add(key);
+        //doneSteps.Add(key);
 
         // 예: 다음 step으로 이동
         // questStep[questId] = "NEXT_STEP_ID";

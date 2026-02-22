@@ -28,37 +28,27 @@ public class QuestObject : MonoBehaviour
 
     public virtual string GetItemPrompt()
     {
-        // 퀘스트 전일시
-        if (QuestManager.Instance.GetQuestState(questData.questId) == QuestState.NotStarted)
+        QuestState state = QuestManager.Instance.GetQuestState(questData.questId);
+
+        // 퀘스트가 진행 중이거나 완료 되었을 경우
+        if (state == QuestState.InProgress || state == QuestState.Completed)
         {
-            // 아이템 조건 검사후 퀘스트 완료시
-            if (QuestManager.Instance.CheckQuestComplete(questData.questId))    // 이 부분은 생각 더 해보셈 바빠서 이것만 적어놈
+            bool completed = QuestManager.Instance.CheckQuestComplete(questData.questId);   // 현재 이 코드는 퀘스트 중이여야만 true를 보내기에 npc에게 말을 걸면 안됨
+
+            // 조건을 만족했다면 완료 대사 아니라면 진행 중 대사 반환
+            if (completed)
             {
-                currentChat = questCompleted;
+                InventoryManager.Instance.RemoveItem(questData.requiredItem);   // 해당 완료 아이템 제거
                 Destroy(gameObject);
+                return questCompleted;
             }
             else
             {
-                currentChat = questNotStarted;
+                return questInProgress;
             }
         }
 
-        // 퀘스트 중일시
-        if (QuestManager.Instance.GetQuestState(questData.questId) == QuestState.InProgress)
-        {
-            // 아이템 조건 검사후 퀘스트 완료시
-            if (QuestManager.Instance.CheckQuestComplete(questData.questId))
-            {
-                currentChat = questCompleted;
-                Destroy(gameObject);
-            }
-            else // 조건 불일치시
-            {
-                Debug.Log("다른 퀘스트임");
-                currentChat = questInProgress;
-            }
-        }
-
-        return currentChat;
+        // 아직 퀘스트를 시작하지 않은 상태라면
+        return questNotStarted;
     }
 }
