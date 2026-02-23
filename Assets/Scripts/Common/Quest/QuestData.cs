@@ -12,7 +12,6 @@ public class QuestData : ScriptableObject
     [TextArea] public string questNotStarted;
     [TextArea] public string questInProgress;
     [TextArea] public string questOnComplete;
-    [TextArea] public string questAfterComplete;
 
     [Header("완료 조건")]
     public ItemData requiredItem;

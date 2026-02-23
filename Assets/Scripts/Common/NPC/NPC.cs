@@ -57,8 +57,8 @@ public class NPC : BaseChat
             // 퀘스트 시작 전 대사 출력
             ChatLogManager.Instance.AddLine(false, quest.questNotStarted);
 
-            // 퀘스트를 진행 상태로 변경
-            QuestManager.Instance.StartQuest(quest.questId);
+            //// 퀘스트를 진행 상태로 변경
+            //QuestManager.Instance.StartQuest(quest.questId);
             return;
         }
 
@@ -79,7 +79,7 @@ public class NPC : BaseChat
 
         // 이미 완료된 퀘스트인 경우
         // 완료 이후 반복 대사 출력
-        ChatLogManager.Instance.AddLine(false, quest.questAfterComplete);
+        ChatLogManager.Instance.AddLine(false, quest.questOnComplete);
     }
 
     // NPC 대화 취소시 나올것들

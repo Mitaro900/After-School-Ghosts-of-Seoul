@@ -204,7 +204,7 @@ public class QuestManager : Singleton<QuestManager>
                 return quest.questInProgress;
 
             case QuestState.Completed:
-                return quest.questAfterComplete;
+                return quest.questOnComplete;
         }
 
         return "";
