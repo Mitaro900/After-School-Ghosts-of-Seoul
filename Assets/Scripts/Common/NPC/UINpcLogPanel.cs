@@ -61,7 +61,7 @@ public class UINpcLogPanel : MonoBehaviour
         var go = Instantiate(sessionButtonPrefab, logContent);
 
         // 버튼 텍스트
-        go.GetComponentInChildren<TMP_Text>().text = $"{session.npcData.NpcName}\n - {session.sessionIndex} -";
+        go.GetComponentInChildren<TMP_Text>().text = $"{session.npcData.displayName}\n - {session.sessionIndex} -";
 
         // 버튼 클릭 시 해당 대화 내용 표시
         go.GetComponent<Button>().onClick.AddListener(() => ShowSession(session));

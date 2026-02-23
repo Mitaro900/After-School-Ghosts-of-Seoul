@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -31,6 +32,10 @@ public class ChatUI : UIBase
 
     [Header("Typing")]
     [SerializeField] private float typingSpeed = 0.02f; // 타이핑 속도
+
+    [Header("Choice UI")]
+    [SerializeField] private Transform choicesRoot;
+    [SerializeField] private Button choiceButtonPrefab;
 
     private NPC npc; // 대화중인 NPC 저장
     private Player player;
@@ -116,6 +121,9 @@ public class ChatUI : UIBase
 
     private IEnumerator TurnCo(string playerText)
     {
+        // AI 호출 전에 이전 선택지 제거
+        ClearChoices();
+
         _busy = true;
         if (input) input.interactable = false;
         inputHelp.text = "채팅이 타이핑 되는동안 입력,ESC가 불가능 합니다.";
@@ -193,7 +201,7 @@ public class ChatUI : UIBase
         성격을 유지하며 자연스럽게 대화하세요.
 
         [기본 설정]
-        {npc.NpcData.NpcPrompt}
+        {npc.NpcData.npcPrompt}
 
         [현재 퀘스트 상태]
         {npcPrompt}
@@ -202,11 +210,28 @@ public class ChatUI : UIBase
         ";
 
         // AI 호출
+        // (예시) NPC ID/Day/Location은 프로젝트 상황에 맞춰 넣기
+        string npcId = npc.NpcData != null ? npc.NpcData.name : ""; // NpcData에 id가 있으면 그걸 쓰는 게 베스트
+        string playerName = "이서준";
+        int day = 1;              // DayManager 있으면 그걸로
+        string location = "";     // LocationManager 있으면 그걸로
+
+        Choice[] availableSteps = Array.Empty<Choice>();
+
+        // quest.useSteps가 켜진 퀘스트만 step choices 제공
+        availableSteps = QuestManager.Instance.GetAvailableStepsForNpcAsChoices(questId, npc); // <- 없으면 아래에 대체안 제공
+
         ChatResponse reply = null;
         yield return StartCoroutine(OpenAIManager.Instance.SendMessage(
-            playerText,
-            finalPrompt,
-            r => reply = r
+            userMessage: playerText,
+            npcPrompt: finalPrompt,
+            npcId: npcId,
+            playerName: playerName,
+            day: day,
+            location: location,
+            memorySummary: "", // ChatLogManager 요약 있으면 넣기
+            availableSteps: availableSteps,
+            onComplete: r => reply = r
         ));
 
         if (string.IsNullOrWhiteSpace(reply.text))
@@ -217,6 +242,9 @@ public class ChatUI : UIBase
         {
             var nBubble = CreateBubble(false);
             yield return StartCoroutine(TypeText(nBubble, reply.text, false, npc, typingSpeed));
+
+            // NPC 답변 출력 끝난 뒤
+            RenderChoices(reply.choices);
 
             ChatLogManager.Instance.AddLine(false, reply.text);
             ChatLogManager.Instance.EndSession(); // 세션 종료
@@ -343,4 +371,71 @@ public class ChatUI : UIBase
         npc = chattingNpc;
         player = chattingPlayer;
     }
+
+    #region 선택지
+    private void ClearChoices()
+    {
+        if (!choicesRoot) return;
+        for (int i = choicesRoot.childCount - 1; i >= 0; i--)
+            Destroy(choicesRoot.GetChild(i).gameObject);
+    }
+
+    private void RenderChoices(Choice[] choices)
+    {
+        ClearChoices();
+
+        if (!choicesRoot || !choiceButtonPrefab) return;
+        if (choices == null || choices.Length == 0) return;
+
+        foreach (var c in choices)
+        {
+            if (c == null || string.IsNullOrWhiteSpace(c.id) || string.IsNullOrWhiteSpace(c.label))
+                continue;
+
+            var btn = Instantiate(choiceButtonPrefab, choicesRoot);
+            var label = btn.GetComponentInChildren<TMP_Text>();
+            if (label) label.text = c.label;
+
+            btn.onClick.AddListener(() =>
+            {
+                // 버튼 클릭 시 처리
+                OnChoiceClicked(c);
+            });
+        }
+    }
+
+    private void OnChoiceClicked(Choice c)
+    {
+        if (c == null) return;
+
+        // 1) 플레이어 선택을 말풍선으로 보여주고 싶으면(선택)
+        // StartTurn(c.label);  // 선택지를 플레이어 입력처럼 처리하고 싶으면 이 줄 사용
+
+        // 2) quest step이면 ApplyStep
+        if (TryParseQuestStep(c.id, out var questId, out var stepId))
+        {
+            QuestManager.Instance.ApplyStep(questId, stepId);
+        }
+
+        // 3) 선택 후 다음 턴을 "선택지 라벨"로 진행시키면 대화 흐름이 자연스러움
+        StartTurn(c.label);
+    }
+
+    private bool TryParseQuestStep(string id, out string questId, out string stepId)
+    {
+        questId = null;
+        stepId = null;
+
+        if (string.IsNullOrWhiteSpace(id)) return false;
+
+        // 권장 포맷: "<questId>:<stepId>"
+        var parts = id.Split(':');
+        if (parts.Length != 2) return false;
+
+        questId = parts[0];
+        stepId = parts[1];
+
+        return !string.IsNullOrEmpty(questId) && !string.IsNullOrEmpty(stepId);
+    }
+    #endregion
 }

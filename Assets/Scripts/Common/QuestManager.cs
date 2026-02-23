@@ -1,7 +1,7 @@
-using NUnit.Framework.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public enum QuestState
 {
@@ -24,6 +24,152 @@ public class QuestManager : Singleton<QuestManager>
 
     // 현재 진행 중인 퀘스트 목록
     private List<QuestData> activeQuests = new();
+
+    // questId → 완료한 stepId 집합
+    private Dictionary<string, HashSet<string>> doneStepsByQuest = new();
+
+    private HashSet<string> GetDoneSet(string questId)
+    {
+        if (!doneStepsByQuest.TryGetValue(questId, out var set))
+        {
+            set = new HashSet<string>();
+            doneStepsByQuest[questId] = set;
+        }
+        return set;
+    }
+
+    public void ApplyStep(string questId, string stepId)
+    {
+        if (string.IsNullOrWhiteSpace(questId) || string.IsNullOrWhiteSpace(stepId))
+        {
+            Debug.LogWarning($"ApplyStep ignored: invalid ids questId='{questId}', stepId='{stepId}'");
+            return;
+        }
+
+        var quest = FindQuestById(questId);
+        if (quest == null)
+        {
+            Debug.LogWarning($"ApplyStep ignored: quest not found '{questId}'");
+            return;
+        }
+
+        // ✅ Step 기반 퀘스트가 아니면: 레거시 모드로 처리
+        if (!quest.useSteps)
+        {
+            // 정책: NotStarted면 시작, "COMPLETE" 같은 stepId면 완료 트리거 가능
+            if (GetQuestState(questId) == QuestState.NotStarted)
+                StartQuest(questId);
+
+            if (stepId.Equals("COMPLETE", StringComparison.OrdinalIgnoreCase))
+                CompleteQuest(quest);
+
+            Debug.Log($"ApplyStep (legacy): quest='{questId}', step='{stepId}', state='{GetQuestState(questId)}'");
+            return;
+        }
+
+        // 1) quest state 보장
+        var state = GetQuestState(questId);
+        if (state == QuestState.Completed)
+        {
+            Debug.Log($"ApplyStep ignored: quest already completed '{questId}'");
+            return;
+        }
+        if (state == QuestState.NotStarted)
+        {
+            // 대화에서 step이 들어오면 자동 시작하는 정책(추천)
+            StartQuest(questId);
+        }
+        if (GetQuestState(questId) != QuestState.InProgress)
+        {
+            Debug.LogWarning($"ApplyStep ignored: quest not in progress '{questId}', state='{GetQuestState(questId)}'");
+            return;
+        }
+
+        // 2) step 정의 찾기
+        var step = quest.steps?.FirstOrDefault(s => s != null && s.stepId == stepId);
+        if (step == null)
+        {
+            Debug.LogWarning($"ApplyStep ignored: step not found quest='{questId}', step='{stepId}'");
+            return;
+        }
+
+        // 3) 선행조건 + 중복 검사
+        var done = GetDoneSet(questId);
+
+        if (done.Contains(stepId))
+        {
+            Debug.Log($"ApplyStep ignored: step already done quest='{questId}', step='{stepId}'");
+            return;
+        }
+
+        if (step.requires != null)
+        {
+            foreach (var req in step.requires)
+            {
+                if (!done.Contains(req))
+                {
+                    Debug.LogWarning($"ApplyStep blocked: missing requirement '{req}' for quest='{questId}', step='{stepId}'");
+                    return;
+                }
+            }
+        }
+
+        // 4) 완료 처리
+        done.Add(stepId);
+        Debug.Log($"ApplyStep OK: quest='{questId}', step='{stepId}', doneCount={done.Count}");
+
+        // 5) 완료 판정
+        bool isCompleted;
+
+        // completeStepId가 있으면 그것을 완료로 본다
+        if (!string.IsNullOrWhiteSpace(quest.completeStepId))
+        {
+            isCompleted = done.Contains(quest.completeStepId);
+        }
+        else
+        {
+            // 없으면 전체 steps 완료 시 완료
+            int total = quest.steps?.Count(s => s != null && !string.IsNullOrWhiteSpace(s.stepId)) ?? 0;
+            isCompleted = (total > 0) && (done.Count >= total);
+        }
+
+        if (isCompleted)
+        {
+            CompleteQuest(quest);
+        }
+    }
+
+    public Choice[] GetAvailableStepsForNpcAsChoices(string questId, NPC npc)
+    {
+        var quest = FindQuestById(questId);
+        if (quest == null || !quest.useSteps) return Array.Empty<Choice>();
+
+        var state = GetQuestState(questId);
+        if (state == QuestState.Completed) return Array.Empty<Choice>();
+
+        var done = GetDoneSet(questId);
+
+        bool IsUnlocked(QuestStepData s)
+        {
+            if (s == null || string.IsNullOrWhiteSpace(s.stepId) || string.IsNullOrWhiteSpace(s.label))
+                return false;
+
+            // 완료된 step은 제외
+            if (done.Contains(s.stepId)) return false;
+
+            // stepNpc가 지정되어 있으면 해당 NPC에서만 노출
+            if (s.stepNpcData != null && npc != null && npc.NpcData != s.stepNpcData) return false;
+
+            // 선행조건
+            if (s.requires == null || s.requires.Count == 0) return true;
+            return s.requires.All(req => done.Contains(req));
+        }
+
+        return quest.steps
+            .Where(IsUnlocked)
+            .Select(s => new Choice { id = $"{questId}:{s.stepId}", label = s.label })
+            .ToArray();
+    }
 
     #region 초기화
 
@@ -63,7 +209,7 @@ public class QuestManager : Singleton<QuestManager>
     {
         // 등록된 퀘스트가 있다면 퀘스트 전송
         if (questDatabase.TryGetValue(questId, out var quest))
-            return quest;   
+            return quest;
 
         return null;
     }
@@ -129,7 +275,7 @@ public class QuestManager : Singleton<QuestManager>
     {
         foreach (var quest in new List<QuestData>(activeQuests))
         {
-            if (quest.targetNpc == npc)
+            if (quest.targetNpcData != null && npc != null && npc.NpcData == quest.targetNpcData)
             {
                 CompleteQuest(quest);
             }
@@ -167,7 +313,7 @@ public class QuestManager : Singleton<QuestManager>
     {
         if (npc == null) return null;
 
-        foreach (var quest in npc.NpcData.RelatedQuests)
+        foreach (var quest in npc.NpcData.relatedQuests)
         {
             var state = GetQuestState(quest.questId);
 
@@ -209,86 +355,5 @@ public class QuestManager : Singleton<QuestManager>
 
         return "";
     }
-
     #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public enum StepResultType
-    {
-        Success,
-        Fail_NotFound,
-        Fail_NotInProgress,
-        Fail_WrongStep,
-        Fail_AlreadyDone,
-        Fail_ConditionNotMet
-    }
-
-    public struct StepResult
-    {
-        public StepResultType type;
-        public string message;
-    }
-
-    public StepResult TryPerformStep(string questId, string stepId, string npcId)
-    {
-        // 1) 퀘스트 존재
-        //if (!questDatabase.ContainsKey(questId))
-        //    return new StepResult { type = StepResultType.Fail_NotFound, message = "Quest not found" };
-
-        // 2) 상태 확인
-        if (GetQuestState(questId) != QuestState.InProgress)
-            return new StepResult { type = StepResultType.Fail_NotInProgress, message = "Quest not in progress" };
-
-        // 3) 이미 완료한 step인지
-        //var key = $"{questId}:{stepId}";
-        //if (doneSteps.Contains(key))
-        //    return new StepResult { type = StepResultType.Fail_AlreadyDone, message = "Step already done" };
-
-        // 4) 현재 step과 일치하는지(단계형일 때)
-        //if (questStep.TryGetValue(questId, out var cur) && !string.IsNullOrEmpty(cur) && cur != stepId)
-        //    return new StepResult { type = StepResultType.Fail_WrongStep, message = $"Current step is {cur}" };
-
-        // 5) 조건 검사(예: 증거 아이템 보유, npcId 일치 등)
-        // 예: ShowEvidence step이면 InventoryManager.HasItem(...) 체크 등
-        // if (!InventoryManager.Instance.HasItem("EVIDENCE_001")) return Fail_ConditionNotMet;
-
-        // 6) 성공 처리: step 완료 기록 + 다음 step으로 전이(혹은 완료)
-        //doneSteps.Add(key);
-
-        // 예: 다음 step으로 이동
-        // questStep[questId] = "NEXT_STEP_ID";
-        // 또는 마지막이면 CompleteQuest(questId);
-
-        return new StepResult { type = StepResultType.Success, message = "OK" };
-    }
-
-    public struct StepOffer
-    {
-        public string questId;
-        public string stepId;
-        public string label; // UI 표시용(또는 prompt용)
-    }
-
-    public List<StepOffer> GetAvailableStepsForNpc(string npcId)
-    {
-        var result = new List<StepOffer>();
-
-        // TODO: npcId와 연관된 퀘스트/단계를 찾아 조건을 만족하면 추가
-        // 예:
-        // if (GetQuestState("Q_PRESSURE_GUNWOO") == InProgress && Inventory.HasItem("EVIDENCE_001") && !doneSteps.Contains("Q_PRESSURE_GUNWOO:SHOW_EVIDENCE"))
-        // result.Add(new StepOffer{ questId="Q_PRESSURE_GUNWOO", stepId="SHOW_EVIDENCE", label="증거 자료를 보여준다" });
-
-        return result;
-    }
 }

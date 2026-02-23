@@ -32,12 +32,47 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
     }
     #endregion
 
+    // 간단 호출용 (기본값으로 확장 정보 없이)
     public IEnumerator SendMessage(string userMessage, string npcPrompt, System.Action<ChatResponse> onComplete)
+    {
+        // 확장 정보 없이도 돌아가게
+        yield return SendMessage(
+            userMessage: userMessage,
+            npcPrompt: npcPrompt,
+            npcId: null,
+            playerName: null,
+            day: 0,
+            location: null,
+            memorySummary: null,
+            availableSteps: null,
+            onComplete: onComplete
+        );
+    }
+
+    // 확장 호출용 (추천)
+    public IEnumerator SendMessage(
+        string userMessage,
+        string npcPrompt,
+        string npcId,
+        string playerName,
+        int day,
+        string location,
+        string memorySummary,
+        Choice[] availableSteps,
+        System.Action<ChatResponse> onComplete)
     {
         var requestData = new ChatRequest
         {
             input = userMessage,
-            npcPrompt = npcPrompt
+            npcPrompt = npcPrompt,
+
+            npcId = npcId,
+            playerName = playerName,
+            day = day,
+            location = location,
+            memorySummary = memorySummary,
+
+            availableSteps = availableSteps
         };
 
         string jsonBody = JsonUtility.ToJson(requestData);
@@ -50,20 +85,24 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
 
-            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("Content-Type", "application/json; charset=utf-8");
 
             if (!string.IsNullOrEmpty(appToken))
                 request.SetRequestHeader("X-App-Token", appToken);
 
             yield return request.SendWebRequest();
 
-            var raw = request.downloadHandler.text;
+            var raw = request.downloadHandler?.text ?? "";
             bool httpOk = request.responseCode >= 200 && request.responseCode < 300;
 
             if (request.result == UnityWebRequest.Result.Success && httpOk)
             {
                 ChatResponse response = null;
-                try { response = JsonUtility.FromJson<ChatResponse>(raw); } catch { }
+                try { response = JsonUtility.FromJson<ChatResponse>(raw); }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"JSON parse error: {e}\nRAW: {raw}");
+                }
 
                 if (response == null)
                     response = new ChatResponse { text = "응답 파싱 실패", choices = System.Array.Empty<Choice>() };
@@ -88,6 +127,16 @@ public class ChatRequest
 {
     public string input;
     public string npcPrompt;
+
+    // 확장 컨텍스트
+    public string npcId;
+    public string playerName;
+    public int day;
+    public string location;
+    public string memorySummary;
+
+    // 서버에서 allowedSteps로 사용
+    public Choice[] availableSteps;
 }
 
 [System.Serializable]

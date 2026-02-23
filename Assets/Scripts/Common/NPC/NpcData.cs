@@ -4,11 +4,16 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NpcData", menuName = "ScriptableObjects/NpcData", order = 1)]
 public class NpcData : ScriptableObject
 {
-    [SerializeField] private string npcName;
-    [SerializeField] private List<QuestData> relatedQuests;
-    [SerializeField] [TextArea] private string npcPrompt;
+    [Header("Identity")]
+    [Tooltip("고유 ID. 바뀌지 않게! 예: KIM_YEONWOO")]
+    public string npcId;
 
-    public string NpcName => npcName;
-    public List<QuestData> RelatedQuests => relatedQuests;
-    public string NpcPrompt => npcPrompt;
+    public string displayName;
+
+    [Header("AI Prompt")]
+    [TextArea] public string npcPrompt;
+
+    [Header("Quest Links")]
+    [Tooltip("이 NPC와 연관된 퀘스트 목록(순서 중요: 선행 → 후행)")]
+    public List<QuestData> relatedQuests = new();
 }
