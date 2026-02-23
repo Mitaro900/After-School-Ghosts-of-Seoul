@@ -127,14 +127,22 @@ public class ChatUI : UIBase
             yield break;
         }
 
-        // 1) 플레이어 말풍선 타이핑(끝날 때까지 기다림)
-        var pBubble = CreateBubble(isPlayer: true);
-        yield return StartCoroutine(TypeText(pBubble, playerText, true, player, typingSpeed));
-        ChatLogManager.Instance.AddLine(true, playerText);
+        // 플레이어가 실제로 입력한 경우에만 세션 시작
+        bool hasPlayerInput = !string.IsNullOrWhiteSpace(playerText);
+        if (hasPlayerInput)
+        {
+            ChatLogManager.Instance.StartSession(npc.NpcData);
 
-        // 2) 퀘스트 정보 가져오기
+            // 플레이어 말풍선 타이핑
+            var pBubble = CreateBubble(isPlayer: true);
+            yield return StartCoroutine(TypeText(pBubble, playerText, true, player, typingSpeed));
+
+            // 플레이어 대사 로그에 추가
+            ChatLogManager.Instance.AddLine(true, playerText);
+        }
+
+        // 퀘스트 정보 가져오기
         var quest = QuestManager.Instance.GetAvailableQuest(npc);
-
         if (quest == null)
         {
             EndBusy();
@@ -142,7 +150,6 @@ public class ChatUI : UIBase
         }
 
         string questId = quest.questId;
-
         if (string.IsNullOrEmpty(questId))
         {
             EndBusy();
@@ -152,7 +159,7 @@ public class ChatUI : UIBase
         var state = QuestManager.Instance.GetQuestState(questId);
         string npcPrompt = "";
 
-        // 3) NotStarted 상태 처리
+        // 퀘스트 상태에 따라 npcPrompt 가져오기
         if (state == QuestState.NotStarted)
         {
             npcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
@@ -167,24 +174,20 @@ public class ChatUI : UIBase
                 //AddSystemBubble("퀘스트를 수락했습니다!"); 재현님에게 물어보고 수락 되었다고 시스템 말풍선 보낼지 물어보기
             }
         }
-        // 4) InProgress 상태 처리
         else if (state == QuestState.InProgress)
         {
             // 아이템 가져온것을 확인 후 완료로 변경
             if (QuestManager.Instance.CheckQuestComplete(questId))
             {
                 npcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);   // Completed 대사로 갱신
-                Debug.Log(npcPrompt);
             }
         }
-        // 5) Completed 상태 처리
         else
         {
             npcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
-            Debug.Log(npcPrompt);
         }
 
-        // 6) AI 프롬프트 구성
+        // AI 프롬프트 구성
         string finalPrompt = $@"
         당신은 이 게임의 NPC입니다. 
         성격을 유지하며 자연스럽게 대화하세요.
@@ -198,7 +201,7 @@ public class ChatUI : UIBase
         플레이어 입력에 맞춰 대답하세요.
         ";
 
-        // 7) AI 호출
+        // AI 호출
         ChatResponse reply = null;
         yield return StartCoroutine(OpenAIManager.Instance.SendMessage(
             playerText,
@@ -209,10 +212,15 @@ public class ChatUI : UIBase
         if (string.IsNullOrWhiteSpace(reply.text))
             reply.text = "죄송합니다, 응답을 받지 못했습니다.";
 
-        // 8) NPC 말풍선
-        var nBubble = CreateBubble(false);
-        yield return StartCoroutine(TypeText(nBubble, reply.text, false, npc, typingSpeed));
-        ChatLogManager.Instance.AddLine(false, reply.text);
+        // NPC가 실제로 답변한 경우에만 로그에 기록
+        if (hasPlayerInput)
+        {
+            var nBubble = CreateBubble(false);
+            yield return StartCoroutine(TypeText(nBubble, reply.text, false, npc, typingSpeed));
+
+            ChatLogManager.Instance.AddLine(false, reply.text);
+            ChatLogManager.Instance.EndSession(); // 세션 종료
+        }
 
         EndBusy();
     }
