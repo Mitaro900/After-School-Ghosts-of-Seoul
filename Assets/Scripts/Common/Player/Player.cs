@@ -18,6 +18,7 @@ public class Player : BaseChat
 
     [Header("Object Info")]
     [SerializeField] private QuestObject currentObject;
+    private TeleportZone currentTeleprot;
 
     private CanvasGroup itemChatCG;
     private NPC currentNPC;
@@ -64,7 +65,7 @@ public class Player : BaseChat
         else { anim.SetBool("isMove", false); }
 
 
-            anim.SetFloat("Xinput", lastMoveDir.x);
+        anim.SetFloat("Xinput", lastMoveDir.x);
         anim.SetFloat("Yinput", lastMoveDir.y);
         rb.linearVelocity = velocity;
     }
@@ -88,6 +89,12 @@ public class Player : BaseChat
             currentObject = col.GetComponent<QuestObject>();
             currentObject.ShowPressEkeyUI();
         }
+
+        if (col.CompareTag("Teleport"))
+        {
+            currentTeleprot = col.GetComponent<TeleportZone>();
+            currentTeleprot.ShowPressEkeyUI();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D col)
@@ -108,6 +115,12 @@ public class Player : BaseChat
         {
             currentObject.HidePressEkeyUI();
             currentObject = null;
+        }
+
+        if (col.CompareTag("Teleport"))
+        {
+            currentTeleprot = col.GetComponent<TeleportZone>();
+            currentTeleprot.HidePressEkeyUI();
         }
     }
 
@@ -133,6 +146,11 @@ public class Player : BaseChat
                 string text = currentObject.GetItemPrompt();
                 itemChatText.text = text;
                 PlayItemChat();
+            }
+
+            if (currentTeleprot != null)
+            {
+                currentTeleprot.Teleport(this);
             }
         }
     }
@@ -181,5 +199,10 @@ public class Player : BaseChat
 
         if (!moveAllow)
             rb.linearVelocity = Vector2.zero;
+    }
+
+    public void SetCurrentTeleport(TeleportZone zone)
+    {
+        currentTeleprot = zone;
     }
 }
