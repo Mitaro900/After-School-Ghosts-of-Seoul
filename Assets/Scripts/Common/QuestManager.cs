@@ -313,8 +313,12 @@ public class QuestManager : Singleton<QuestManager>
     {
         if (npc == null) return null;
 
+        QuestData lastQuest = null;
+
         foreach (var quest in npc.NpcData.relatedQuests)
         {
+            lastQuest = quest;
+
             var state = GetQuestState(quest.questId);
 
             // 아직 완료 안 된 첫 번째 퀘스트 반환
@@ -322,7 +326,8 @@ public class QuestManager : Singleton<QuestManager>
                 return quest;
         }
 
-        return null;
+        // 전부 완료됐으면 마지막 퀘스트 계속 반환
+        return lastQuest;
     }
     #endregion
 
