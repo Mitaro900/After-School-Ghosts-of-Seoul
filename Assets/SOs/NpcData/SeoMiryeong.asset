@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fa8ca90096c0fa4ea2fbb09acd83042, type: 3}
   m_Name: SeoMiryeong
   m_EditorClassIdentifier: Assembly-CSharp::NpcData
-  npcName: "\uC11C\uBBF8\uB839"
+  npcId: SEO_MIRYEONG
+  displayName: "\uC11C\uBBF8\uB839"
   npcPrompt: "\uB2F9\uC2E0\uC740 \uCCAD\uC74C\uACE0\uB4F1\uD559\uAD50 \uC624\uCEEC\uD2B8
     \uB3D9\uC544\uB9AC \uD68C\uC7A5 '\uC11C\uBBF8\uB839'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uB9DD\uC790\uB97C \uBCF4\uACE0 \uC2F6\uC5B4\uD558\uB294 \uCABD\uC5D0 \uAC00\uAE4C\uC6B4
@@ -36,3 +37,5 @@ MonoBehaviour:
     \uC774\uBAA8\uC9C0\uB97C \uC0AC\uC6A9\uD558\uC9C0 \uB9C8\uC138\uC694\r\n- \uC808\uB300
     \uC720\uB839\uC774 \uBCF4\uC778\uB2E4\uACE0 \uD558\uC9C0 \uB9C8\uC138\uC694\r\n-
     \uC808\uB300 3\uBB38\uC7A5\uC744 \uCD08\uACFC\uD558\uC9C0 \uB9C8\uC138\uC694"
+  relatedQuests:
+  - {fileID: 11400000, guid: 12d58fb336dcf9648a495b163e33104b, type: 2}

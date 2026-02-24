@@ -151,63 +151,76 @@ public class ChatUI : UIBase
 
         // 퀘스트 정보 가져오기
         var quest = QuestManager.Instance.GetAvailableQuest(npc);
-        if (quest == null)
+        
+        string questId = "";
+        string questNpcPrompt = "";
+        Choice[] availableSteps = Array.Empty<Choice>();
+
+        // quest.useSteps가 켜진 퀘스트만 step choices 제공
+        availableSteps = QuestManager.Instance.GetAvailableStepsForNpcAsChoices(questId, npc);
+
+        if (quest != null && !string.IsNullOrEmpty(quest.questId))
         {
-            EndBusy();
-            yield break;
-        }
+            questId = quest.questId;
 
-        string questId = quest.questId;
-        if (string.IsNullOrEmpty(questId))
-        {
-            EndBusy();
-            yield break;
-        }
+            var state = QuestManager.Instance.GetQuestState(questId);
+            questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
 
-        var state = QuestManager.Instance.GetQuestState(questId);
-        string npcPrompt = "";
-
-        // 퀘스트 상태에 따라 npcPrompt 가져오기
-        if (state == QuestState.NotStarted)
-        {
-            npcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
-            Debug.Log(npcPrompt);
-
-            // 플레이어가 긍정적인 말 입력 시 퀘스트 시작
-            if (IsPlayerAccepting(playerText))
-            {
-                QuestManager.Instance.StartQuest(questId);
-                npcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId); // InProgress 대사로 갱신
-
-                //AddSystemBubble("퀘스트를 수락했습니다!"); 재현님에게 물어보고 수락 되었다고 시스템 말풍선 보낼지 물어보기
-            }
-        }
-        else if (state == QuestState.InProgress)
-        {
-            // 아이템 가져온것을 확인 후 완료로 변경
-            if (QuestManager.Instance.CheckQuestComplete(questId))
-            {
-                npcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);   // Completed 대사로 갱신
-            }
+            // step 기반이면 availableSteps 채우기 (quest.useSteps인 경우)
+            availableSteps = QuestManager.Instance.GetAvailableStepsForNpcAsChoices(questId, npc);
         }
         else
         {
-            npcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
+            // 퀘스트 없으면 잡담/일반모드
+            questNpcPrompt = "현재 진행 중인 퀘스트가 없다. 자연스럽게 대화만 이어가라. 플레이어가 원하면 주변 소문/일상 이야기를 하라.";
         }
+        
+        //var state = QuestManager.Instance.GetQuestState(questId);
+
+        //// 퀘스트 상태에 따라 npcPrompt 가져오기
+        //if (state == QuestState.NotStarted)
+        //{
+        //    questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
+        //    Debug.Log(questNpcPrompt);
+
+        //    // 플레이어가 긍정적인 말 입력 시 퀘스트 시작
+        //    if (IsPlayerAccepting(playerText))
+        //    {
+        //        QuestManager.Instance.StartQuest(questId);
+        //        questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId); // InProgress 대사로 갱신
+        //    }
+        //}
+        //else if (state == QuestState.InProgress)
+        //{
+        //    // 아이템 가져온것을 확인 후 완료로 변경
+        //    if (QuestManager.Instance.CheckQuestComplete(questId))
+        //    {
+        //        questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);   // Completed 대사로 갱신
+        //    }
+        //}
+        //else
+        //{
+        //    questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
+        //}
 
         // AI 프롬프트 구성
-        string finalPrompt = $@"
-        당신은 이 게임의 NPC입니다. 
-        성격을 유지하며 자연스럽게 대화하세요.
+        var topStep = QuestManager.Instance.GetTopAvailableStep(questId, npc);
+        string stepPrompt = topStep != null ? topStep.stepPromptOverride : "";
 
+        string finalPrompt = $@"
         [기본 설정]
         {npc.NpcData.npcPrompt}
-
+        
         [현재 퀘스트 상태]
-        {npcPrompt}
-
+        {questNpcPrompt}
+        
+        [현재 핵심 Step 가이드]
+        {stepPrompt}
+        
         플레이어 입력에 맞춰 대답하세요.
         ";
+
+        QuestManager.Instance.MarkTalked(questId, npc.NpcData);
 
         // AI 호출
         // (예시) NPC ID/Day/Location은 프로젝트 상황에 맞춰 넣기
@@ -215,11 +228,6 @@ public class ChatUI : UIBase
         string playerName = "이서준";
         int day = 1;              // DayManager 있으면 그걸로
         string location = "";     // LocationManager 있으면 그걸로
-
-        Choice[] availableSteps = Array.Empty<Choice>();
-
-        // quest.useSteps가 켜진 퀘스트만 step choices 제공
-        availableSteps = QuestManager.Instance.GetAvailableStepsForNpcAsChoices(questId, npc); // <- 없으면 아래에 대체안 제공
 
         ChatResponse reply = null;
         yield return StartCoroutine(OpenAIManager.Instance.SendMessage(
@@ -378,6 +386,8 @@ public class ChatUI : UIBase
         if (!choicesRoot) return;
         for (int i = choicesRoot.childCount - 1; i >= 0; i--)
             Destroy(choicesRoot.GetChild(i).gameObject);
+
+        choicesRoot.gameObject.SetActive(false);
     }
 
     private void RenderChoices(Choice[] choices)
@@ -386,6 +396,8 @@ public class ChatUI : UIBase
 
         if (!choicesRoot || !choiceButtonPrefab) return;
         if (choices == null || choices.Length == 0) return;
+
+        choicesRoot.gameObject.SetActive(true);
 
         foreach (var c in choices)
         {

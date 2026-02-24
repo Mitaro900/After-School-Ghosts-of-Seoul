@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fa8ca90096c0fa4ea2fbb09acd83042, type: 3}
   m_Name: ParkDoyoon
   m_EditorClassIdentifier: Assembly-CSharp::NpcData
-  npcId: 
-  displayName: 
+  npcId: PARK_DOYOON
+  displayName: "\uBC15\uB3C4\uC724"
   npcPrompt: "\uB2F9\uC2E0\uC740 \uC8FC\uC778\uACF5\uC758 \uCE5C\uAD6C '\uBC15\uB3C4\uC724'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uC0AC\uAD50\uC801\uC774\uC9C0\uB9CC \uB208\uCE58\uAC00 \uBE60\uB984\r\n- \uD45C\uC815
     \uBCC0\uD654\uAC00 \uB9CE\uACE0, \uD559\uAD50 \uC0DD\uD65C, \uB3D9\uC544\uB9AC
@@ -36,4 +36,4 @@ MonoBehaviour:
     \uC720\uB839\uC774 \uBCF4\uC778\uB2E4\uACE0 \uD558\uC9C0 \uB9C8\uC138\uC694\r\n-
     \uC808\uB300 3\uBB38\uC7A5\uC744 \uCD08\uACFC\uD558\uC9C0 \uB9C8\uC138\uC694"
   relatedQuests:
-  - {fileID: 11400000, guid: 3c4b29014499bd94983cd25a61627a97, type: 2}
+  - {fileID: 11400000, guid: 12d58fb336dcf9648a495b163e33104b, type: 2}

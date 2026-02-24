@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fa8ca90096c0fa4ea2fbb09acd83042, type: 3}
   m_Name: ChoiGunwoo
   m_EditorClassIdentifier: Assembly-CSharp::NpcData
-  npcName: "\uCD5C\uAC74\uC6B0"
+  npcId: CHOI_GUNWOO
+  displayName: "\uCD5C\uAC74\uC6B0"
   npcPrompt: "\uB2F9\uC2E0\uC740 \uD559\uD3ED \uAC00\uD574\uC790 '\uCD5C\uAC74\uC6B0'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uC790\uAE30\uD569\uB9AC\uD654\uAC00 \uAC15\uD558\uACE0 \uCC45\uC784\uC744 \uD68C\uD53C\uD558\uB294
     \uD0C0\uC785\r\n- \uD798\uC758 \uC6B0\uC704\uB97C \uD3ED\uB825\uC774\uB77C\uAE30\uBCF4\uB2E4
@@ -35,3 +36,5 @@ MonoBehaviour:
     \uC774\uBAA8\uC9C0\uB97C \uC0AC\uC6A9\uD558\uC9C0 \uB9C8\uC138\uC694\r\n- \uC808\uB300
     \uC720\uB839\uC774 \uBCF4\uC778\uB2E4\uACE0 \uD558\uC9C0 \uB9C8\uC138\uC694\r\n-
     \uC808\uB300 3\uBB38\uC7A5\uC744 \uCD08\uACFC\uD558\uC9C0 \uB9C8\uC138\uC694"
+  relatedQuests:
+  - {fileID: 11400000, guid: 12d58fb336dcf9648a495b163e33104b, type: 2}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 
 public enum QuestState
@@ -28,6 +29,39 @@ public class QuestManager : Singleton<QuestManager>
     // questId → 완료한 stepId 집합
     private Dictionary<string, HashSet<string>> doneStepsByQuest = new();
 
+    // questId → 플래그 집합
+    private Dictionary<string, HashSet<string>> flagsByQuest = new();
+
+    // questId → (npcId) 대화 충족 플래그
+    private Dictionary<string, HashSet<string>> talkedNpcByQuest = new();
+
+    #region Step/Flag 관리
+    private HashSet<string> GetFlagSet(string questId)
+    {
+        if (!flagsByQuest.TryGetValue(questId, out var set))
+        {
+            set = new HashSet<string>();
+            flagsByQuest[questId] = set;
+        }
+        return set;
+    }
+
+    private HashSet<string> GetTalkedSet(string questId)
+    {
+        if (!talkedNpcByQuest.TryGetValue(questId, out var set))
+        {
+            set = new HashSet<string>();
+            talkedNpcByQuest[questId] = set;
+        }
+        return set;
+    }
+
+    public void MarkTalked(string questId, NpcData npcData)
+    {
+        if (string.IsNullOrEmpty(questId) || npcData == null || string.IsNullOrEmpty(npcData.npcId)) return;
+        GetTalkedSet(questId).Add(npcData.npcId);
+    }
+
     private HashSet<string> GetDoneSet(string questId)
     {
         if (!doneStepsByQuest.TryGetValue(questId, out var set))
@@ -38,105 +72,82 @@ public class QuestManager : Singleton<QuestManager>
         return set;
     }
 
+    private bool IsStepCompleteConditionMet(string questId, QuestStepData step)
+    {
+        var cond = step.completeCondition;
+        if (cond == null) return true; // 조건 없으면 즉시 완료
+
+        // 아이템 조건
+        if (cond.requiredItem != null)
+        {
+            if (!InventoryManager.Instance.HasItem(cond.requiredItem))
+                return false;
+        }
+
+        // 특정 NPC와 대화 조건
+        if (cond.requiredTalkNpc != null && !string.IsNullOrEmpty(cond.requiredTalkNpc.npcId))
+        {
+            var talked = GetTalkedSet(questId);
+            if (!talked.Contains(cond.requiredTalkNpc.npcId))
+                return false;
+        }
+
+        // 플래그 조건
+        if (cond.requiredFlags != null && cond.requiredFlags.Count > 0)
+        {
+            var flags = GetFlagSet(questId);
+            if (!cond.requiredFlags.TrueForAll(flags.Contains))
+                return false;
+        }
+
+        return true;
+    }
+
     public void ApplyStep(string questId, string stepId)
     {
-        if (string.IsNullOrWhiteSpace(questId) || string.IsNullOrWhiteSpace(stepId))
-        {
-            Debug.LogWarning($"ApplyStep ignored: invalid ids questId='{questId}', stepId='{stepId}'");
-            return;
-        }
-
         var quest = FindQuestById(questId);
-        if (quest == null)
-        {
-            Debug.LogWarning($"ApplyStep ignored: quest not found '{questId}'");
-            return;
-        }
+        if (quest == null || !quest.useSteps) return;
 
-        // ✅ Step 기반 퀘스트가 아니면: 레거시 모드로 처리
-        if (!quest.useSteps)
-        {
-            // 정책: NotStarted면 시작, "COMPLETE" 같은 stepId면 완료 트리거 가능
-            if (GetQuestState(questId) == QuestState.NotStarted)
-                StartQuest(questId);
+        if (GetQuestState(questId) == QuestState.NotStarted) StartQuest(questId);
+        if (GetQuestState(questId) != QuestState.InProgress) return;
 
-            if (stepId.Equals("COMPLETE", StringComparison.OrdinalIgnoreCase))
-                CompleteQuest(quest);
+        var step = quest.steps.FirstOrDefault(s => s.stepId == stepId);
+        if (step == null) return;
 
-            Debug.Log($"ApplyStep (legacy): quest='{questId}', step='{stepId}', state='{GetQuestState(questId)}'");
-            return;
-        }
-
-        // 1) quest state 보장
-        var state = GetQuestState(questId);
-        if (state == QuestState.Completed)
-        {
-            Debug.Log($"ApplyStep ignored: quest already completed '{questId}'");
-            return;
-        }
-        if (state == QuestState.NotStarted)
-        {
-            // 대화에서 step이 들어오면 자동 시작하는 정책(추천)
-            StartQuest(questId);
-        }
-        if (GetQuestState(questId) != QuestState.InProgress)
-        {
-            Debug.LogWarning($"ApplyStep ignored: quest not in progress '{questId}', state='{GetQuestState(questId)}'");
-            return;
-        }
-
-        // 2) step 정의 찾기
-        var step = quest.steps?.FirstOrDefault(s => s != null && s.stepId == stepId);
-        if (step == null)
-        {
-            Debug.LogWarning($"ApplyStep ignored: step not found quest='{questId}', step='{stepId}'");
-            return;
-        }
-
-        // 3) 선행조건 + 중복 검사
         var done = GetDoneSet(questId);
+        if (done.Contains(stepId)) return;
 
-        if (done.Contains(stepId))
+        // 선행 조건(해금 조건)
+        if (step.requires != null && step.requires.Count > 0)
         {
-            Debug.Log($"ApplyStep ignored: step already done quest='{questId}', step='{stepId}'");
+            if (!step.requires.All(done.Contains)) return;
+        }
+
+        // 완료 조건(아이템/대화/플래그)
+        if (!IsStepCompleteConditionMet(questId, step))
+        {
+            // 여기서 “조건 부족” 안내를 UI/로그로 줄 수도 있음
+            Debug.Log($"ApplyStep blocked: step completeCondition not met. quest={questId}, step={stepId}");
             return;
         }
 
-        if (step.requires != null)
-        {
-            foreach (var req in step.requires)
-            {
-                if (!done.Contains(req))
-                {
-                    Debug.LogWarning($"ApplyStep blocked: missing requirement '{req}' for quest='{questId}', step='{stepId}'");
-                    return;
-                }
-            }
-        }
-
-        // 4) 완료 처리
+        // 완료 처리
         done.Add(stepId);
-        Debug.Log($"ApplyStep OK: quest='{questId}', step='{stepId}', doneCount={done.Count}");
 
-        // 5) 완료 판정
-        bool isCompleted;
+        // Step 효과 실행
+        var eff = step.onComplete;
+        if (eff != null)
+        {
+            if (eff.action == StepOnCompleteAction.SetFlag && !string.IsNullOrEmpty(eff.flagToSet))
+                GetFlagSet(questId).Add(eff.flagToSet);
 
-        // completeStepId가 있으면 그것을 완료로 본다
-        if (!string.IsNullOrWhiteSpace(quest.completeStepId))
-        {
-            isCompleted = done.Contains(quest.completeStepId);
-        }
-        else
-        {
-            // 없으면 전체 steps 완료 시 완료
-            int total = quest.steps?.Count(s => s != null && !string.IsNullOrWhiteSpace(s.stepId)) ?? 0;
-            isCompleted = (total > 0) && (done.Count >= total);
+            if (eff.action == StepOnCompleteAction.CompleteQuest)
+                CompleteQuest(quest);
         }
 
-        if (isCompleted)
-        {
+        // (선택) QuestData.completeStepId도 지원하고 싶으면:
+        if (!string.IsNullOrEmpty(quest.completeStepId) && done.Contains(quest.completeStepId))
             CompleteQuest(quest);
-        }
     }
 
     public Choice[] GetAvailableStepsForNpcAsChoices(string questId, NPC npc)
@@ -170,6 +181,29 @@ public class QuestManager : Singleton<QuestManager>
             .Select(s => new Choice { id = $"{questId}:{s.stepId}", label = s.label })
             .ToArray();
     }
+
+    public QuestStepData GetTopAvailableStep(string questId, NPC npc)
+    {
+        var quest = FindQuestById(questId);
+        if (quest == null || !quest.useSteps) return null;
+
+        var done = GetDoneSet(questId);
+
+        bool IsUnlocked(QuestStepData s)
+        {
+            if (s == null || string.IsNullOrWhiteSpace(s.stepId)) return false;
+            if (done.Contains(s.stepId)) return false;
+            if (s.stepNpcData != null && npc != null && npc.NpcData != s.stepNpcData) return false;
+            if (s.requires == null || s.requires.Count == 0) return true;
+            return s.requires.All(done.Contains);
+        }
+
+        return quest.steps
+            .Where(IsUnlocked)
+            .OrderByDescending(s => s.priority)
+            .FirstOrDefault();
+    }
+    #endregion
 
     #region 초기화
 
