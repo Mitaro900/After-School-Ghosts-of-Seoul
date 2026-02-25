@@ -135,8 +135,6 @@ public class ChatUI : UIBase
         bool hasPlayerInput = !string.IsNullOrWhiteSpace(playerText);
         if (hasPlayerInput)
         {
-            ChatLogManager.Instance.StartSession(npc.NpcData);
-
             // 플레이어 말풍선 타이핑
             var pBubble = CreateBubble(isPlayer: true);
             yield return StartCoroutine(TypeText(pBubble, playerText, true, player, typingSpeed));
@@ -279,7 +277,6 @@ public class ChatUI : UIBase
             yield return StartCoroutine(TypeText(nBubble, finalNpcText, false, npc, typingSpeed));
 
             ChatLogManager.Instance.AddLine(false, finalNpcText);
-            ChatLogManager.Instance.EndSession(); // 세션 종료
         }
 
         EndBusy();
@@ -411,5 +408,7 @@ public class ChatUI : UIBase
     {
         npc = chattingNpc;
         player = chattingPlayer;
+
+        ChatLogManager.Instance.StartSession(npc.NpcData);
     }
 }
