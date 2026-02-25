@@ -37,6 +37,7 @@ public class Player : BaseChat
 
     protected override void Update()
     {
+        Debug.Log(currentTeleprot);
         TalkToObject();
 
         if (isMove)
@@ -119,8 +120,13 @@ public class Player : BaseChat
 
         if (col.CompareTag("Teleport"))
         {
-            currentTeleprot = col.GetComponent<TeleportZone>();
-            currentTeleprot.HidePressEkeyUI();
+            TeleportZone zone = col.GetComponent<TeleportZone>();
+
+            if (currentTeleprot == zone)
+            {
+                zone.HidePressEkeyUI();
+                currentTeleprot = null;
+            }
         }
     }
 
