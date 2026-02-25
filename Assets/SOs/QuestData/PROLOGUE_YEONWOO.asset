@@ -17,16 +17,23 @@ MonoBehaviour:
   questNotStarted: 
   questInProgress: 
   questOnComplete: 
-  requiredItem: {fileID: 0}
-  targetNpcData: {fileID: 11400000, guid: 2231bb3a325864a47b649894bb5e2c0b, type: 2}
+  requiredItem: {fileID: 11400000, guid: 6a3cc922739527f49b14b9786e1dfa4a, type: 2}
+  targetNpcData: {fileID: 0}
   givesReward: 0
   rewardItems: []
   useSteps: 1
   steps:
   - stepId: START
-    label: "\uAE40\uC5F0\uC6B0\uC758 \uC774\uC57C\uAE30\uB97C \uB4E4\uC5B4\uBCF8\uB2E4"
+    label: "\uAE40\uC5F0\uC6B0\uC758 \uC774\uC57C\uAE30\uB97C \uB4E4\uC5B4\uBCF4\uAE30"
     stepNpcData: {fileID: 11400000, guid: 2231bb3a325864a47b649894bb5e2c0b, type: 2}
     requires: []
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 0
+      keywords: []
+      regex: 
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
@@ -43,11 +50,26 @@ MonoBehaviour:
       \uD78C\uD2B8\uB97C \uC544\uC8FC \uC9E7\uAC8C \uD758\uB9B0\uB2E4."
     priority: 100
   - stepId: ASK_DETAIL
-    label: "\uADF8\uB0A0 \uBB34\uC2A8 \uC77C\uC774 \uC788\uC5C8\uB294\uC9C0 \uB354
-      \uBB3B\uB294\uB2E4"
+    label: "\uB354 \uC790\uC138\uD55C \uC774\uC57C\uAE30\uB97C \uB4E4\uC5B4\uBCF4\uAE30"
     stepNpcData: {fileID: 11400000, guid: 2231bb3a325864a47b649894bb5e2c0b, type: 2}
     requires:
     - START
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 1
+      keywords:
+      - "\uBB34\uC2A8"
+      - "\uC5B4\uB5BB\uAC8C"
+      - "\uADF8\uB0A0"
+      - "\uC0AC\uACE0"
+      - "\uC8FD"
+      - "\uC65C"
+      - "\uBB34\uC2A8 \uC77C"
+      - "\uC5B4\uCA4C\uB2E4"
+      - "\uC0C1\uD669"
+      regex: 
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
@@ -65,16 +87,26 @@ MonoBehaviour:
       \uBE44, \uCCB4\uC721\uAD00, \uB4A4\uCABD \uC911 \uD558\uB098)."
     priority: 90
   - stepId: ASK_WEATHER
-    label: "\uADF8\uB0A0 \uB0A0\uC528(\uBE44/\uCD94\uC704)\uB97C \uB354 \uCE90\uBB3B\uB294\uB2E4"
+    label: "\uADF8\uB0A0\uC758 \uB0A0\uC528"
     stepNpcData: {fileID: 11400000, guid: 2231bb3a325864a47b649894bb5e2c0b, type: 2}
     requires:
     - ASK_DETAIL
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 1
+      keywords:
+      - "\uB0A0\uC528"
+      - "\uBE44"
+      - "\uC7A5\uB9C8"
+      regex: 
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
       requiredFlags: []
     onComplete:
-      action: 2
+      action: 1
       flagToSet: F_CLUE_WEATHER
     stepPromptOverride: "\uB0A0\uC528 \uC9C8\uBB38\uC5D0\uB294 \uC9E7\uAC8C '\uBE44'
       \uB2E8\uC11C\uB97C \uD655\uC815\uC801\uC73C\uB85C \uC900\uB2E4.\r\n\uB2E8,
@@ -86,17 +118,26 @@ MonoBehaviour:
       \uB123\uB294\uB2E4."
     priority: 70
   - stepId: ASK_LOCATION
-    label: "\uC5B4\uB514\uC5D0\uC11C \uC788\uC5C8\uB294\uC9C0(\uD559\uAD50 \uC548/\uBC16)\uB97C
-      \uBB3B\uB294\uB2E4"
+    label: "\uADF8\uB0A0\uC758 \uC7A5\uC18C"
     stepNpcData: {fileID: 11400000, guid: 2231bb3a325864a47b649894bb5e2c0b, type: 2}
     requires:
     - ASK_DETAIL
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 1
+      keywords:
+      - "\uC5B4\uB514"
+      - "\uC7A5\uC18C"
+      - "\uC704\uCE58"
+      regex: 
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
       requiredFlags: []
     onComplete:
-      action: 2
+      action: 1
       flagToSet: F_CLUE_LOCATION
     stepPromptOverride: "\uC7A5\uC18C \uC9C8\uBB38\uC5D0\uB294 '\uD559\uAD50'\uB294
       \uD655\uC815\uD558\uC9C0\uB9CC \uAD6C\uCCB4 \uC704\uCE58\uB294 \uD750\uB9B0\uB2E4.\r\n\uC608:
@@ -105,17 +146,26 @@ MonoBehaviour:
       \uBC29\uD5A5 \uD78C\uD2B8\uB97C \uD55C \uB2E8\uC5B4\uB85C \uB0A8\uAE34\uB2E4."
     priority: 70
   - stepId: ASK_WHO
-    label: "\uADF8\uB54C \uAC19\uC774 \uC788\uB358 \uC0AC\uB78C\uC774 \uC788\uC5C8\uB294\uC9C0
-      \uBB3B\uB294\uB2E4"
+    label: "\uBAA9\uACA9\uC790"
     stepNpcData: {fileID: 11400000, guid: 2231bb3a325864a47b649894bb5e2c0b, type: 2}
     requires:
     - ASK_DETAIL
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 1
+      keywords:
+      - "\uB204\uAD6C"
+      - "\uB204\uAC00"
+      - "\uAC19\uC774"
+      regex: 
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
       requiredFlags: []
     onComplete:
-      action: 2
+      action: 1
       flagToSet: F_CLUE_WITNESS
     stepPromptOverride: "\uC778\uBB3C \uC9C8\uBB38\uC5D0\uB294 \uC774\uB984\uC744
       \uC9C1\uC811 \uB9D0\uD558\uC9C0 \uB9D0\uACE0 '\uD559\uB144/\uC0C1\uC9D5(\uB125\uD0C0\uC774/\uC154\uCE20
@@ -125,11 +175,18 @@ MonoBehaviour:
       \uBD84\uB178\uAC00 \uBA3C\uC800\uB2E4."
     priority: 70
   - stepId: SUSPECT_NOT_ACCIDENT
-    label: "\uC0AC\uACE0\uAC00 \uC544\uB2D0 \uAC00\uB2A5\uC131\uC744 \uC870\uC2EC\uC2A4\uB7FD\uAC8C
-      \uAEBC\uB0B8\uB2E4"
+    label: "\uC0AC\uACE0\uC0AC\uAC00 \uC544\uB2D0 \uAC00\uB2A5\uC131"
     stepNpcData: {fileID: 11400000, guid: 2231bb3a325864a47b649894bb5e2c0b, type: 2}
     requires:
     - ASK_DETAIL
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 3
+      keywords: []
+      regex: "(\uC0AC\uACE0).*(\uC544\uB2C8|\uC544\uB2CC|\uC544\uB2C8\uC796|\uC544\uB2D0)|
+        (\uC790\uC0B4|\uC0B4\uD574|\uBC00|\uBAA9\uACA9|\uD611\uBC15)"
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
@@ -149,17 +206,26 @@ MonoBehaviour:
       \uBC29\uD5A5\uC73C\uB85C 1\uBB38\uC7A5."
     priority: 60
   - stepId: ASK_DOYOON_RUMOR
-    label: "\uB3C4\uC724\uC5D0\uAC8C \uD559\uAD50 \uC18C\uBB38(\uCCB4\uC721\uAD00
-      \uB4A4)\uC744 \uBB3C\uC5B4\uBCF8\uB2E4"
+    label: "\uC18C\uBB38"
     stepNpcData: {fileID: 11400000, guid: 0b8c3a63b3f5ba349965dbb48a32b3f9, type: 2}
     requires:
     - SUSPECT_NOT_ACCIDENT
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 1
+      keywords:
+      - "\uC18C\uBB38"
+      - "\uC598\uAE30"
+      - "\uC0AC\uACE0\uC0AC"
+      regex: 
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
       requiredFlags: []
     onComplete:
-      action: 2
+      action: 1
       flagToSet: F_CLUE_LOCATION
     stepPromptOverride: "\uBC15\uB3C4\uC724 \uB9D0\uD22C\uB85C \uBC18\uC751\uD55C\uB2E4.
       \uC720\uB839\uC744 \uBCF8\uB2E4\uB294 \uB9D0\uC740 \uBBFF\uC9C0 \uBABB\uD558\uC9C0\uB9CC,
@@ -169,16 +235,24 @@ MonoBehaviour:
       \uB9D0 \uAC78\uAE30)\uB85C \uC774\uC5B4\uC9C0\uB294 \uC9C8\uBB38\uC744 \uB358\uC9C4\uB2E4."
     priority: 80
   - stepId: CONFRONT_GUNWOO
-    label: "\uADF8\uB0A0 \uCCB4\uC721\uAD00 \uB4A4 \uC774\uC57C\uAE30\uB97C \uAEBC\uB0B4\uBCF8\uB2E4"
+    label: "\uADF8\uB0A0\uC758 \uC9C4\uC2E4"
     stepNpcData: {fileID: 11400000, guid: 90b972c3da8b67e4396a8de110fdd776, type: 2}
     requires:
     - ASK_DOYOON_RUMOR
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 3
+      keywords: []
+      regex: "(\uCD5C\uAC74\uC6B0|\uAC74\uC6B0).*(\uADF8\uB0A0|\uCCB4\uC721\uAD00)|
+        (\uADF8\uB0A0).*(\uCCB4\uC721\uAD00).*(\uB4A4|\uD6C4\uBB38|\uB4B7)| (\uCCB4\uC721\uAD00).*(\uB4A4|\uD6C4\uBB38).*(\uADF8\uB0A0)"
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 0}
       requiredTalkNpc: {fileID: 0}
       requiredFlags: []
     onComplete:
-      action: 2
+      action: 1
       flagToSet: F_GUNWOO_DEFENSE_UP
     stepPromptOverride: "\uCD5C\uAC74\uC6B0\uB294 \uBC29\uC5B4\uC801\uC774\uB2E4.
       \uC9C1\uC811 \uC790\uBC31\uD558\uC9C0 \uC54A\uB294\uB2E4.\r\n\uB9D0\uC774 \uAE38\uC5B4\uC9C0\uC9C0
@@ -188,16 +262,23 @@ MonoBehaviour:
       \uB958\uB85C \uB04A\uB294\uB2E4."
     priority: 90
   - stepId: RECORD_TRUTH
-    label: "\uB3D9\uC544\uB9AC \uAE30\uB85D\uC9C0\uC5D0 \uC0AC\uAC74\uC744 \uC815\uB9AC\uD55C\uB2E4"
+    label: "\uC0AC\uAC74 \uC815\uB9AC"
     stepNpcData: {fileID: 11400000, guid: fa1a5bf038a9b7b468a387dfd8eb4966, type: 2}
     requires:
     - CONFRONT_GUNWOO
+    anyOf: []
+    anyOfMin: 1
+    trigger:
+      type: 0
+      keywords: []
+      regex: 
+      caseInsensitive: 1
     completeCondition:
       requiredItem: {fileID: 11400000, guid: 6a3cc922739527f49b14b9786e1dfa4a, type: 2}
       requiredTalkNpc: {fileID: 0}
       requiredFlags: []
     onComplete:
-      action: 1
+      action: 2
       flagToSet: 
     stepPromptOverride: "\uC11C\uBBF8\uB839\uC740 \uBD84\uC11D\uAC00\uB2E4. \uAC10\uC815\uC744
       '\uAD6C\uC870'\uB85C \uC815\uB9AC\uD55C\uB2E4.\r\n\uD50C\uB808\uC774\uC5B4\uAC00

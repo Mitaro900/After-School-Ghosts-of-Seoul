@@ -32,24 +32,6 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
     }
     #endregion
 
-    // 간단 호출용 (기본값으로 확장 정보 없이)
-    public IEnumerator SendMessage(string userMessage, string npcPrompt, System.Action<ChatResponse> onComplete)
-    {
-        // 확장 정보 없이도 돌아가게
-        yield return SendMessage(
-            userMessage: userMessage,
-            npcPrompt: npcPrompt,
-            npcId: null,
-            playerName: null,
-            day: 0,
-            location: null,
-            memorySummary: null,
-            availableSteps: null,
-            onComplete: onComplete
-        );
-    }
-
-    // 확장 호출용 (추천)
     public IEnumerator SendMessage(
         string userMessage,
         string npcPrompt,
@@ -58,7 +40,6 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
         int day,
         string location,
         string memorySummary,
-        Choice[] availableSteps,
         System.Action<ChatResponse> onComplete)
     {
         var requestData = new ChatRequest
@@ -71,8 +52,6 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
             day = day,
             location = location,
             memorySummary = memorySummary,
-
-            availableSteps = availableSteps
         };
 
         string jsonBody = JsonUtility.ToJson(requestData);
@@ -98,16 +77,11 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
             if (request.result == UnityWebRequest.Result.Success && httpOk)
             {
                 ChatResponse response = null;
-                try { response = JsonUtility.FromJson<ChatResponse>(raw); }
-                catch (System.Exception e)
-                {
-                    Debug.LogError($"JSON parse error: {e}\nRAW: {raw}");
-                }
+                try { response = JsonUtility.FromJson<ChatResponse>(raw); } catch { }
 
                 if (response == null)
-                    response = new ChatResponse { text = "응답 파싱 실패", choices = System.Array.Empty<Choice>() };
+                    response = new ChatResponse { text = "응답 파싱 실패" };
 
-                if (response.choices == null) response.choices = System.Array.Empty<Choice>();
                 if (string.IsNullOrWhiteSpace(response.text))
                     response.text = "죄송합니다, 응답을 처리하지 못했습니다.";
 
@@ -116,7 +90,7 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
             else
             {
                 Debug.LogError($"Proxy Error: {request.responseCode} {request.error}\nURL: {API_URL}\n{raw}");
-                onComplete?.Invoke(new ChatResponse { text = "죄송합니다, 응답을 받지 못했습니다.", choices = System.Array.Empty<Choice>() });
+                onComplete?.Invoke(new ChatResponse { text = "죄송합니다, 응답을 받지 못했습니다." });
             }
         }
     }
@@ -134,21 +108,10 @@ public class ChatRequest
     public int day;
     public string location;
     public string memorySummary;
-
-    // 서버에서 allowedSteps로 사용
-    public Choice[] availableSteps;
 }
 
 [System.Serializable]
 public class ChatResponse
 {
     public string text;
-    public Choice[] choices;
-}
-
-[System.Serializable]
-public class Choice
-{
-    public string id;
-    public string label;
 }

@@ -1,7 +1,6 @@
-using System;
+using Singleton.Component;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 
 public enum QuestState
@@ -11,7 +10,18 @@ public enum QuestState
     Completed
 }
 
-public class QuestManager : Singleton<QuestManager>
+public enum ApplyStepResult
+{
+    Ok,
+    Invalid,
+    Locked,
+    AlreadyDone,
+    MissingItem,
+    MissingTalk,
+    MissingFlag
+}
+
+public class QuestManager : SingletonComponent<QuestManager>
 {
     // 인스펙터에 등록하는 전체 퀘스트 목록
     [Header("퀘스트 목록")]
@@ -34,6 +44,46 @@ public class QuestManager : Singleton<QuestManager>
 
     // questId → (npcId) 대화 충족 플래그
     private Dictionary<string, HashSet<string>> talkedNpcByQuest = new();
+
+    // questId → 특정 step에서 막힌 횟수
+    private Dictionary<string, int> stuckCounterByQuest = new();
+
+    #region Singleton
+    protected override void AwakeInstance()
+    {
+        Initialize();
+    }
+
+    protected override bool InitInstance()
+    {
+        foreach (var quest in allQuests)
+        {
+            if (!questDatabase.ContainsKey(quest.questId))
+                questDatabase.Add(quest.questId, quest);
+        }
+
+        return true;
+    }
+
+    protected override void ReleaseInstance()
+    {
+        questDatabase.Clear();
+    }
+    #endregion
+
+    #region 힌트 모드
+    private int GetStuck(string questId)
+    {
+        return stuckCounterByQuest.TryGetValue(questId, out var v) ? v : 0;
+    }
+
+    private void SetStuck(string questId, int v)
+    {
+        stuckCounterByQuest[questId] = Mathf.Max(0, v);
+    }
+
+    public int GetStuckCountForUi(string questId) => GetStuck(questId);
+    #endregion
 
     #region Step/Flag 관리
     private HashSet<string> GetFlagSet(string questId)
@@ -72,114 +122,154 @@ public class QuestManager : Singleton<QuestManager>
         return set;
     }
 
-    private bool IsStepCompleteConditionMet(string questId, QuestStepData step)
+    private ApplyStepResult CheckCompleteCondition(string questId, QuestStepData step)
     {
         var cond = step.completeCondition;
-        if (cond == null) return true; // 조건 없으면 즉시 완료
+        if (cond == null) return ApplyStepResult.Ok;
 
-        // 아이템 조건
         if (cond.requiredItem != null)
         {
             if (!InventoryManager.Instance.HasItem(cond.requiredItem))
-                return false;
+                return ApplyStepResult.MissingItem;
         }
 
-        // 특정 NPC와 대화 조건
-        if (cond.requiredTalkNpc != null && !string.IsNullOrEmpty(cond.requiredTalkNpc.npcId))
+        if (cond.requiredTalkNpc != null && !string.IsNullOrWhiteSpace(cond.requiredTalkNpc.npcId))
         {
-            var talked = GetTalkedSet(questId);
-            if (!talked.Contains(cond.requiredTalkNpc.npcId))
-                return false;
+            if (!GetTalkedSet(questId).Contains(cond.requiredTalkNpc.npcId))
+                return ApplyStepResult.MissingTalk;
         }
 
-        // 플래그 조건
         if (cond.requiredFlags != null && cond.requiredFlags.Count > 0)
         {
             var flags = GetFlagSet(questId);
-            if (!cond.requiredFlags.TrueForAll(flags.Contains))
-                return false;
+            if (!cond.requiredFlags.All(flags.Contains))
+                return ApplyStepResult.MissingFlag;
         }
 
-        return true;
+        return ApplyStepResult.Ok;
     }
 
-    public void ApplyStep(string questId, string stepId)
+    public ApplyStepResult ApplyStep(string questId, string stepId)
     {
+        if (string.IsNullOrWhiteSpace(questId) || string.IsNullOrWhiteSpace(stepId))
+            return ApplyStepResult.Invalid;
+
         var quest = FindQuestById(questId);
-        if (quest == null || !quest.useSteps) return;
+        if (quest == null || !quest.useSteps)
+            return ApplyStepResult.Invalid;
 
-        if (GetQuestState(questId) == QuestState.NotStarted) StartQuest(questId);
-        if (GetQuestState(questId) != QuestState.InProgress) return;
+        if (GetQuestState(questId) == QuestState.Completed)
+            return ApplyStepResult.Invalid;
 
-        var step = quest.steps.FirstOrDefault(s => s.stepId == stepId);
-        if (step == null) return;
+        if (GetQuestState(questId) == QuestState.NotStarted)
+            StartQuest(questId);
+
+        if (GetQuestState(questId) != QuestState.InProgress)
+            return ApplyStepResult.Invalid;
+
+        var step = quest.steps.FirstOrDefault(s => s != null && s.stepId == stepId);
+        if (step == null)
+            return ApplyStepResult.Invalid;
 
         var done = GetDoneSet(questId);
-        if (done.Contains(stepId)) return;
+        if (done.Contains(stepId))
+            return ApplyStepResult.AlreadyDone;
 
-        // 선행 조건(해금 조건)
-        if (step.requires != null && step.requires.Count > 0)
-        {
-            if (!step.requires.All(done.Contains)) return;
-        }
+        // 해금 조건
+        if (!IsUnlockedStep(questId, null, step)) // npc 조건은 이미 trigger 단계에서 걸러지는 게 일반적
+            return ApplyStepResult.Locked;
 
-        // 완료 조건(아이템/대화/플래그)
-        if (!IsStepCompleteConditionMet(questId, step))
-        {
-            // 여기서 “조건 부족” 안내를 UI/로그로 줄 수도 있음
-            Debug.Log($"ApplyStep blocked: step completeCondition not met. quest={questId}, step={stepId}");
-            return;
-        }
+        // 완료 조건
+        var condResult = CheckCompleteCondition(questId, step);
+        if (condResult != ApplyStepResult.Ok)
+            return condResult;
 
         // 완료 처리
         done.Add(stepId);
 
-        // Step 효과 실행
-        var eff = step.onComplete;
-        if (eff != null)
+        // 효과
+        if (step.onComplete != null)
         {
-            if (eff.action == StepOnCompleteAction.SetFlag && !string.IsNullOrEmpty(eff.flagToSet))
-                GetFlagSet(questId).Add(eff.flagToSet);
+            if (step.onComplete.action == StepOnCompleteAction.SetFlag && !string.IsNullOrWhiteSpace(step.onComplete.flagToSet))
+                GetFlagSet(questId).Add(step.onComplete.flagToSet);
 
-            if (eff.action == StepOnCompleteAction.CompleteQuest)
+            if (step.onComplete.action == StepOnCompleteAction.CompleteQuest)
                 CompleteQuest(quest);
         }
 
-        // (선택) QuestData.completeStepId도 지원하고 싶으면:
-        if (!string.IsNullOrEmpty(quest.completeStepId) && done.Contains(quest.completeStepId))
-            CompleteQuest(quest);
+        return ApplyStepResult.Ok;
     }
 
-    public Choice[] GetAvailableStepsForNpcAsChoices(string questId, NPC npc)
+    public ApplyStepResult TryApplyStepFromInput(string questId, NPC npc, string playerInput, out string appliedStepId)
     {
+        TryAutoApplySteps(questId, npc);
+
+        appliedStepId = null;
+
         var quest = FindQuestById(questId);
-        if (quest == null || !quest.useSteps) return Array.Empty<Choice>();
+        if (quest == null || !quest.useSteps) return ApplyStepResult.Invalid;
 
-        var state = GetQuestState(questId);
-        if (state == QuestState.Completed) return Array.Empty<Choice>();
+        if (GetQuestState(questId) == QuestState.Completed) return ApplyStepResult.Invalid;
 
-        var done = GetDoneSet(questId);
+        if (GetQuestState(questId) == QuestState.NotStarted)
+            StartQuest(questId);
 
-        bool IsUnlocked(QuestStepData s)
+        var candidates = quest.steps
+            .Where(s => IsUnlockedStep(questId, npc, s))
+            .Where(s => TriggerMatches(s, playerInput))
+            .OrderByDescending(s => s.priority)
+            .ToList();
+
+        if (candidates.Count == 0)
         {
-            if (s == null || string.IsNullOrWhiteSpace(s.stepId) || string.IsNullOrWhiteSpace(s.label))
-                return false;
-
-            // 완료된 step은 제외
-            if (done.Contains(s.stepId)) return false;
-
-            // stepNpc가 지정되어 있으면 해당 NPC에서만 노출
-            if (s.stepNpcData != null && npc != null && npc.NpcData != s.stepNpcData) return false;
-
-            // 선행조건
-            if (s.requires == null || s.requires.Count == 0) return true;
-            return s.requires.All(req => done.Contains(req));
+            // 진행 못했으면 stuck +1
+            SetStuck(questId, GetStuck(questId) + 1);
+            return ApplyStepResult.Locked;
         }
 
-        return quest.steps
-            .Where(IsUnlocked)
-            .Select(s => new Choice { id = $"{questId}:{s.stepId}", label = s.label })
-            .ToArray();
+        var chosen = candidates[0];
+        var result = ApplyStep(questId, chosen.stepId);
+
+        if (result == ApplyStepResult.Ok)
+        {
+            appliedStepId = chosen.stepId;
+            // 진행됐으면 stuck 리셋
+            SetStuck(questId, 0);
+        }
+        else
+        {
+            // 조건 부족/잠김이면 stuck 증가(선택)
+            SetStuck(questId, GetStuck(questId) + 1);
+        }
+
+        return result;
+    }
+
+    private bool TryAutoApplySteps(string questId, NPC npc)
+    {
+        var quest = FindQuestById(questId);
+        if (quest == null || !quest.useSteps) return false;
+        if (GetQuestState(questId) == QuestState.Completed) return false;
+
+        var done = GetDoneSet(questId);
+        bool appliedAny = false;
+
+        foreach (var s in quest.steps)
+        {
+            if (s == null) continue;
+            if (done.Contains(s.stepId)) continue;
+
+            // trigger가 없거나 None이면 자동 적용 대상으로 취급
+            bool isAuto = (s.trigger == null || s.trigger.type == StepTriggerType.None);
+            if (!isAuto) continue;
+
+            if (!IsUnlockedStep(questId, npc, s)) continue;
+
+            var r = ApplyStep(questId, s.stepId);
+            if (r == ApplyStepResult.Ok) appliedAny = true;
+        }
+
+        return appliedAny;
     }
 
     public QuestStepData GetTopAvailableStep(string questId, NPC npc)
@@ -187,43 +277,106 @@ public class QuestManager : Singleton<QuestManager>
         var quest = FindQuestById(questId);
         if (quest == null || !quest.useSteps) return null;
 
-        var done = GetDoneSet(questId);
+        var state = GetQuestState(questId);
+        if (state == QuestState.Completed) return null;
 
-        bool IsUnlocked(QuestStepData s)
-        {
-            if (s == null || string.IsNullOrWhiteSpace(s.stepId)) return false;
-            if (done.Contains(s.stepId)) return false;
-            if (s.stepNpcData != null && npc != null && npc.NpcData != s.stepNpcData) return false;
-            if (s.requires == null || s.requires.Count == 0) return true;
-            return s.requires.All(done.Contains);
-        }
+        // NotStarted여도 "대화하면 시작" 정책이면 여기서 StartQuest해도 됨(선택)
+        // if (state == QuestState.NotStarted) StartQuest(questId);
 
+        // 현재 NPC에서 unlock된 step 중 priority가 가장 높은 1개
         return quest.steps
-            .Where(IsUnlocked)
+            .Where(s => IsUnlockedStep(questId, npc, s))
             .OrderByDescending(s => s.priority)
             .FirstOrDefault();
     }
-    #endregion
 
-    #region 초기화
-
-    // 전체 퀘스트를 Dictionary에 등록
-    protected override void Awake()
+    private bool IsUnlockedStep(string questId, NPC npc, QuestStepData s)
     {
-        base.Awake();
+        if (s == null || string.IsNullOrWhiteSpace(s.stepId)) return false;
 
-        foreach (var quest in allQuests)
+        var done = GetDoneSet(questId);
+        if (done.Contains(s.stepId)) return false;
+
+        // NPC 제한
+        if (s.stepNpcData != null && npc != null && npc.NpcData != s.stepNpcData) return false;
+
+        // AND requires
+        bool andOk = (s.requires == null || s.requires.Count == 0) || s.requires.All(done.Contains);
+
+        // K-of-N anyOf
+        bool anyOk = true;
+        if (s.anyOf != null && s.anyOf.Count > 0)
         {
-            if (!questDatabase.ContainsKey(quest.questId))
-                questDatabase.Add(quest.questId, quest);
+            int count = s.anyOf.Count(done.Contains);
+            int min = Mathf.Max(1, s.anyOfMin);
+            anyOk = count >= min;
         }
+
+        return andOk && anyOk;
     }
 
+    private bool TriggerMatches(QuestStepData s, string input)
+    {
+        if (s?.trigger == null) return false;
+        if (s.trigger.type == StepTriggerType.None) return false;
+        if (string.IsNullOrWhiteSpace(input)) return false;
+
+        var t = s.trigger;
+
+        switch (t.type)
+        {
+            case StepTriggerType.KeywordAny:
+                {
+                    if (t.keywords == null || t.keywords.Count == 0) return false;
+                    var src = t.caseInsensitive ? input.ToLowerInvariant() : input;
+                    return t.keywords.Any(k =>
+                    {
+                        if (string.IsNullOrWhiteSpace(k)) return false;
+                        var kk = t.caseInsensitive ? k.ToLowerInvariant() : k;
+                        return src.Contains(kk);
+                    });
+                }
+
+            case StepTriggerType.KeywordAll:
+                {
+                    if (t.keywords == null || t.keywords.Count == 0) return false;
+                    var src = t.caseInsensitive ? input.ToLowerInvariant() : input;
+                    return t.keywords.All(k =>
+                    {
+                        if (string.IsNullOrWhiteSpace(k)) return false;
+                        var kk = t.caseInsensitive ? k.ToLowerInvariant() : k;
+                        return src.Contains(kk);
+                    });
+                }
+
+            case StepTriggerType.Regex:
+                {
+                    if (string.IsNullOrWhiteSpace(t.regex)) return false;
+                    try
+                    {
+                        var options = t.caseInsensitive ? System.Text.RegularExpressions.RegexOptions.IgnoreCase : 0;
+                        return System.Text.RegularExpressions.Regex.IsMatch(input, t.regex, options);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+        }
+
+        return false;
+    }
+
+    public string GetStepLabel(string questId, string stepId)
+    {
+        var quest = FindQuestById(questId);
+        var step = quest?.steps?.Find(s => s != null && s.stepId == stepId);
+        return step != null ? step.label : stepId;
+    }
     #endregion
 
 
     #region 상태 조회
-
     // 퀘스트 상태 반환 (없으면 NotStarted로 초기화)
     public QuestState GetQuestState(string questId)
     {
@@ -232,12 +385,10 @@ public class QuestManager : Singleton<QuestManager>
 
         return questStates[questId];
     }
-
     #endregion
 
 
     #region 퀘스트 찾기
-
     // questId로 등록된 퀘스트가 있는지 검색
     private QuestData FindQuestById(string questId)
     {
@@ -247,12 +398,10 @@ public class QuestManager : Singleton<QuestManager>
 
         return null;
     }
-
     #endregion
 
 
     #region 퀘스트 시작
-
     // 퀘스트 시작 처리
     public void StartQuest(string questId)
     {
@@ -269,12 +418,10 @@ public class QuestManager : Singleton<QuestManager>
 
         Debug.Log($"퀘스트 시작: {quest.questName}");
     }
-
     #endregion
 
 
     #region NPC 아이템 조건 
-
     // NPC와 대화했을 때 완료 가능한지 검사
     public bool CheckQuestComplete(string questId)
     {
@@ -298,12 +445,10 @@ public class QuestManager : Singleton<QuestManager>
         CompleteQuest(quest);
         return true;
     }
-
     #endregion
 
 
     #region NPC 대화 조건 (특정 NPC 방문형)
-
     // 특정 NPC와 대화 시 완료되는 퀘스트 처리
     public void CheckTalkCondition(NPC npc)
     {
@@ -315,12 +460,10 @@ public class QuestManager : Singleton<QuestManager>
             }
         }
     }
-
     #endregion
 
 
     #region 완료 처리
-
     // 실제 퀘스트 완료 처리
     public void CompleteQuest(QuestData quest)
     {
@@ -336,12 +479,10 @@ public class QuestManager : Singleton<QuestManager>
 
         Debug.Log($"퀘스트 완료: {quest.questName}");
     }
-
     #endregion
 
 
     #region NPC용 인터페이스
-
     // NPC가 현재 줄 수 있는 퀘스트 반환
     public QuestData GetAvailableQuest(NPC npc)
     {
@@ -367,7 +508,6 @@ public class QuestManager : Singleton<QuestManager>
 
 
     #region 유틸
-
     // 현재 진행 중인 퀘스트 목록 반환
     public List<QuestData> GetActiveQuests()
     {

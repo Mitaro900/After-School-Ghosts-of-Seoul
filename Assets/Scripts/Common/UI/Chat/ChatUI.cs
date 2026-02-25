@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -121,9 +120,6 @@ public class ChatUI : UIBase
 
     private IEnumerator TurnCo(string playerText)
     {
-        // AI 호출 전에 이전 선택지 제거
-        ClearChoices();
-
         _busy = true;
         if (input) input.interactable = false;
         inputHelp.text = "채팅이 타이핑 되는동안 입력,ESC가 불가능 합니다.";
@@ -151,30 +147,60 @@ public class ChatUI : UIBase
 
         // 퀘스트 정보 가져오기
         var quest = QuestManager.Instance.GetAvailableQuest(npc);
-        
-        string questId = "";
+
+        // quest가 null이어도 대화는 진행(버그 픽스)
+        string questId = quest != null ? quest.questId : "";
+        string appliedStepId = null;
+        var applyResult = QuestManager.Instance.TryApplyStepFromInput(questId, npc, playerText, out appliedStepId);
         string questNpcPrompt = "";
-        Choice[] availableSteps = Array.Empty<Choice>();
+        string stepPrompt = "";
 
-        // quest.useSteps가 켜진 퀘스트만 step choices 제공
-        availableSteps = QuestManager.Instance.GetAvailableStepsForNpcAsChoices(questId, npc);
-
-        if (quest != null && !string.IsNullOrEmpty(quest.questId))
+        // quest가 있으면 상태/프롬프트 준비
+        if (!string.IsNullOrEmpty(questId))
         {
-            questId = quest.questId;
+            // 대화 기록(선택: StepCondition.requiredTalkNpc용)
+            QuestManager.Instance.MarkTalked(questId, npc.NpcData);
 
-            var state = QuestManager.Instance.GetQuestState(questId);
+            // 현재 상태 프롬프트
             questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
 
-            // step 기반이면 availableSteps 채우기 (quest.useSteps인 경우)
-            availableSteps = QuestManager.Instance.GetAvailableStepsForNpcAsChoices(questId, npc);
+            if (applyResult == ApplyStepResult.Ok)
+            {
+                // step이 적용되었으면 상태 프롬프트 갱신
+                questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
+
+                // (선택) 로그/시스템 메시지로 알려주고 싶으면
+                // AddSystemBubble($"[DEBUG] Step Applied: {appliedStepId}");
+            }
+            else
+            {
+                // (선택) 조건 부족 피드백을 시스템 버블로 안내 (개발 중에만 추천)
+                // if (applyResult == ApplyStepResult.MissingItem) AddSystemBubble("아이템이 부족합니다.");
+            }
+
+            // Step별 프롬프트(TopStep 1개)
+            var topStep = QuestManager.Instance.GetTopAvailableStep(questId, npc);
+            if (topStep != null) stepPrompt = topStep.stepPromptOverride ?? "";
         }
         else
         {
-            // 퀘스트 없으면 잡담/일반모드
-            questNpcPrompt = "현재 진행 중인 퀘스트가 없다. 자연스럽게 대화만 이어가라. 플레이어가 원하면 주변 소문/일상 이야기를 하라.";
+            // 퀘스트 없으면 잡담 모드
+            questNpcPrompt = "현재 진행 중인 퀘스트가 없다. 자연스럽게 대화만 이어가라.";
         }
-        
+
+        int stuck = QuestManager.Instance.GetStuckCountForUi(questId); // 아래 함수 추가 필요
+        string hintPrompt = "";
+
+        if (stuck >= 2)
+        {
+            hintPrompt = @"
+            [힌트 모드]
+            플레이어가 방향을 못 잡고 있다.
+            대사의 마지막 한 문장에, 다음에 물어볼 만한 단서 단어를 자연스럽게 1~2개 포함해라.
+            직접 '키워드를 말해' 같은 안내는 금지한다.
+            ";
+        }
+
         //var state = QuestManager.Instance.GetQuestState(questId);
 
         //// 퀘스트 상태에 따라 npcPrompt 가져오기
@@ -204,9 +230,6 @@ public class ChatUI : UIBase
         //}
 
         // AI 프롬프트 구성
-        var topStep = QuestManager.Instance.GetTopAvailableStep(questId, npc);
-        string stepPrompt = topStep != null ? topStep.stepPromptOverride : "";
-
         string finalPrompt = $@"
         [기본 설정]
         {npc.NpcData.npcPrompt}
@@ -216,6 +239,8 @@ public class ChatUI : UIBase
         
         [현재 핵심 Step 가이드]
         {stepPrompt}
+        
+        {hintPrompt}
         
         플레이어 입력에 맞춰 대답하세요.
         ";
@@ -238,7 +263,6 @@ public class ChatUI : UIBase
             day: day,
             location: location,
             memorySummary: "", // ChatLogManager 요약 있으면 넣기
-            availableSteps: availableSteps,
             onComplete: r => reply = r
         ));
 
@@ -248,19 +272,18 @@ public class ChatUI : UIBase
         // NPC가 실제로 답변한 경우에만 로그에 기록
         if (hasPlayerInput)
         {
+            string sysAppend = BuildSystemAppend(applyResult, questId, appliedStepId);
+            string finalNpcText = reply.text + sysAppend;
+
             var nBubble = CreateBubble(false);
-            yield return StartCoroutine(TypeText(nBubble, reply.text, false, npc, typingSpeed));
+            yield return StartCoroutine(TypeText(nBubble, finalNpcText, false, npc, typingSpeed));
 
-            // NPC 답변 출력 끝난 뒤
-            RenderChoices(reply.choices);
-
-            ChatLogManager.Instance.AddLine(false, reply.text);
+            ChatLogManager.Instance.AddLine(false, finalNpcText);
             ChatLogManager.Instance.EndSession(); // 세션 종료
         }
 
         EndBusy();
     }
-
 
     private void EndBusy()
     {
@@ -354,6 +377,16 @@ public class ChatUI : UIBase
         return false;
     }
 
+    // 퀘스트 진행 상황에 따른 시스템 메시지 생성
+    private string BuildSystemAppend(ApplyStepResult result, string questId, string stepId)
+    {
+        if (result != ApplyStepResult.Ok || string.IsNullOrWhiteSpace(stepId))
+            return "";
+
+        var label = QuestManager.Instance.GetStepLabel(questId, stepId);
+        return $"\n\n<size=80%><color=#AAAAAA>진행: {label} (완료)</color></size>";
+    }
+
     // 말풍선 사이즈를 현재 채팅에 맞게 변환함
     private void UpdateBubbleSize(ChatBubble bubble)
     {
@@ -379,75 +412,4 @@ public class ChatUI : UIBase
         npc = chattingNpc;
         player = chattingPlayer;
     }
-
-    #region 선택지
-    private void ClearChoices()
-    {
-        if (!choicesRoot) return;
-        for (int i = choicesRoot.childCount - 1; i >= 0; i--)
-            Destroy(choicesRoot.GetChild(i).gameObject);
-
-        choicesRoot.gameObject.SetActive(false);
-    }
-
-    private void RenderChoices(Choice[] choices)
-    {
-        ClearChoices();
-
-        if (!choicesRoot || !choiceButtonPrefab) return;
-        if (choices == null || choices.Length == 0) return;
-
-        choicesRoot.gameObject.SetActive(true);
-
-        foreach (var c in choices)
-        {
-            if (c == null || string.IsNullOrWhiteSpace(c.id) || string.IsNullOrWhiteSpace(c.label))
-                continue;
-
-            var btn = Instantiate(choiceButtonPrefab, choicesRoot);
-            var label = btn.GetComponentInChildren<TMP_Text>();
-            if (label) label.text = c.label;
-
-            btn.onClick.AddListener(() =>
-            {
-                // 버튼 클릭 시 처리
-                OnChoiceClicked(c);
-            });
-        }
-    }
-
-    private void OnChoiceClicked(Choice c)
-    {
-        if (c == null) return;
-
-        // 1) 플레이어 선택을 말풍선으로 보여주고 싶으면(선택)
-        // StartTurn(c.label);  // 선택지를 플레이어 입력처럼 처리하고 싶으면 이 줄 사용
-
-        // 2) quest step이면 ApplyStep
-        if (TryParseQuestStep(c.id, out var questId, out var stepId))
-        {
-            QuestManager.Instance.ApplyStep(questId, stepId);
-        }
-
-        // 3) 선택 후 다음 턴을 "선택지 라벨"로 진행시키면 대화 흐름이 자연스러움
-        StartTurn(c.label);
-    }
-
-    private bool TryParseQuestStep(string id, out string questId, out string stepId)
-    {
-        questId = null;
-        stepId = null;
-
-        if (string.IsNullOrWhiteSpace(id)) return false;
-
-        // 권장 포맷: "<questId>:<stepId>"
-        var parts = id.Split(':');
-        if (parts.Length != 2) return false;
-
-        questId = parts[0];
-        stepId = parts[1];
-
-        return !string.IsNullOrEmpty(questId) && !string.IsNullOrEmpty(stepId);
-    }
-    #endregion
 }

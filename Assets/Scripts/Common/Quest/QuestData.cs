@@ -2,26 +2,48 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using UnityEngine;
 
-public enum StepOnCompleteAction
+public enum StepTriggerType
 {
     None,
-    CompleteQuest,  // 이 step 완료 시 퀘스트 완료 처리
-    SetFlag         // 플래그 1개 세팅
+    KeywordAny,
+    KeywordAll,
+    Regex
+}
+
+[System.Serializable]
+public class StepTrigger
+{
+    public StepTriggerType type = StepTriggerType.KeywordAny;
+
+    [Tooltip("KeywordAny/All에서 사용. 동의어까지 넣는 것을 추천.")]
+    public List<string> keywords = new();
+
+    [Tooltip("Regex에서 사용. 예: 체육관.*뒤")]
+    public string regex;
+
+    public bool caseInsensitive = true;
 }
 
 [System.Serializable]
 public class StepCondition
 {
-    public ItemData requiredItem;       // 있으면 인벤토리 보유 필요
-    public NpcData requiredTalkNpc;     // 있으면 해당 NPC와 '대화 충족' 플래그 필요
-    public List<string> requiredFlags;  // 있으면 모두 충족해야 함
+    public ItemData requiredItem;      // 있으면 인벤토리 보유 필요
+    public NpcData requiredTalkNpc;    // 있으면 해당 NPC와 대화 기록 필요(선택)
+    public List<string> requiredFlags; // 있으면 모두 충족 필요(선택)
+}
+
+public enum StepOnCompleteAction
+{
+    None,
+    SetFlag,
+    CompleteQuest
 }
 
 [System.Serializable]
 public class StepEffect
 {
     public StepOnCompleteAction action = StepOnCompleteAction.None;
-    public string flagToSet;            // action==SetFlag일 때 세팅할 플래그
+    public string flagToSet;
 }
 
 [System.Serializable]
@@ -32,8 +54,13 @@ public class QuestStepData
     public string label;
     public NpcData stepNpcData;
 
-    [Header("Unlock 조건(AND)")]
-    public List<string> requires;   // 선행 step들
+    [Header("Unlock 조건")]
+    public List<string> requires; // AND
+    public List<string> anyOf;    // (선택) K-of-N
+    public int anyOfMin = 1;
+
+    [Header("Trigger(플레이어 입력으로 자동 진행)")]
+    public StepTrigger trigger;
 
     [Header("완료 조건(선택)")]
     public StepCondition completeCondition;
@@ -43,10 +70,10 @@ public class QuestStepData
 
     [Header("Step별 프롬프트(선택)")]
     [TextArea(6, 20)]
-    public string stepPromptOverride; // 이 step에서만 적용되는 추가 프롬프트
+    public string stepPromptOverride;
 
     [Header("선택")]
-    public int priority = 0; // 같은 NPC에서 여러 step 열릴 때 우선순위
+    public int priority = 0;
 }
 
 [CreateAssetMenu(fileName = "QuestData", menuName = "ScriptableObjects/QuestData")]
