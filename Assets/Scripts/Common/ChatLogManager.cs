@@ -51,6 +51,28 @@ public class ChatLogManager : Singleton<ChatLogManager>
         };
     }
 
+    // 열려있는 세션 제거
+    public void RemoveSession(DialogueSession session)
+    {
+        if (session == null) return;
+
+        if (!npcSessions.ContainsKey(session.npcData))
+            return;
+
+        var list = npcSessions[session.npcData];
+
+        if (!list.Contains(session))
+            return;
+
+        list.Remove(session);
+
+        // 번호 재정렬
+        for (int i = 0; i < list.Count; i++)
+        {
+            list[i].sessionIndex = i + 1;
+        }
+    }
+
     // 한 줄 대화 추가
     public void AddLine(bool isPlayer, string message)
     {

@@ -9,6 +9,7 @@ public class UINpcLogPanel : MonoBehaviour
     [SerializeField] private GameObject logCavars;  // 이전 대화내용 보는 캔버스
     [SerializeField] private GameObject openButton; // 여는 버튼
     [SerializeField] private GameObject CloseButton;    // 닫는 버튼
+    [SerializeField] private GameObject deleteCurrentButton;    // 세션 삭제 버튼
 
     [Header("Left List")]
     [SerializeField] private Transform logContent;          // NPC LOG 선택 버튼
@@ -29,6 +30,7 @@ public class UINpcLogPanel : MonoBehaviour
     {
         openButton.SetActive(false);
         CloseButton.SetActive(true);
+        deleteCurrentButton.SetActive(true);
         logCavars.SetActive(true);
 
         // ChatLogManager에 등록된 모든 NPC 데이터 가져오기
@@ -52,6 +54,7 @@ public class UINpcLogPanel : MonoBehaviour
 
         openButton.SetActive(true);
         CloseButton.SetActive(false);
+        deleteCurrentButton.SetActive(false);
         logCavars.SetActive(false);
     }
 
@@ -91,5 +94,34 @@ public class UINpcLogPanel : MonoBehaviour
     {
         foreach (Transform child in chatContent)
             Destroy(child.gameObject);
+    }
+
+    // 세션 삭제
+    public void DeleteCurrentSession()
+    {
+        if (currentSession == null)
+            return;
+
+        ChatLogManager.Instance.RemoveSession(currentSession);
+
+        currentSession = null;
+
+        ClearChatView();
+        RefreshSessionList();
+    }
+
+    // 세션 재정렬
+    private void RefreshSessionList()
+    {
+        foreach (Transform child in logContent)
+            Destroy(child.gameObject);
+
+        foreach (var npcPair in ChatLogManager.Instance.GetAllNpcSessions())
+        {
+            foreach (var session in npcPair.Value)
+            {
+                CreateSessionButton(session);
+            }
+        }
     }
 }
