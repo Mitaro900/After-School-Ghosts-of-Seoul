@@ -50,14 +50,14 @@ public class StepEffect
 public class QuestStepData
 {
     [Header("Identity")]
-    public string stepId;
-    public string label;
-    public NpcData stepNpcData;
+    public string stepId;       // 고유 ID
+    public string label;        // step 이름
+    public NpcData stepNpcData; // NPC 프롬프트를 특정 NPC에 적용하고 싶을 때 사용. 없으면 모든 NPC에 적용.
 
     [Header("Unlock 조건")]
-    public List<string> requires; // AND
-    public List<string> anyOf;    // (선택) K-of-N
-    public int anyOfMin = 1;
+    public List<string> requires;   // AND
+    public List<string> anyOf;      // (선택) K-of-N
+    public int anyOfMin = 1;        // anyOfMin이 0이면 anyOf는 선택 사항이 됨
 
     [Header("Trigger(플레이어 입력으로 자동 진행)")]
     public StepTrigger trigger;
@@ -73,15 +73,15 @@ public class QuestStepData
     public string stepPromptOverride;
 
     [Header("선택")]
-    public int priority = 0;
+    public int priority = 0;    // 여러 step이 동시에 unlock/complete 조건을 만족할 때 우선적으로 진행할 step 선택. 높을수록 우선
 }
 
 [CreateAssetMenu(fileName = "QuestData", menuName = "ScriptableObjects/QuestData")]
 public class QuestData : ScriptableObject
 {
     [Header("기본 정보")]
-    public string questId;
-    public string questName;
+    public string questId;      // 고유 ID
+    public string questName;    // 퀘스트 이름
 
     [Header("NPC 프롬프트")]
     [TextArea] public string questNotStarted;

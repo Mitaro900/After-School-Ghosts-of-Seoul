@@ -72,20 +72,24 @@ public class QuestManager : SingletonComponent<QuestManager>
     #endregion
 
     #region 힌트 모드
+    // 특정 퀘스트의 특정 step에서 막힌 횟수 반환
     private int GetStuck(string questId)
     {
         return stuckCounterByQuest.TryGetValue(questId, out var v) ? v : 0;
     }
 
+    // 특정 퀘스트의 막힌 횟수 설정
     private void SetStuck(string questId, int v)
     {
         stuckCounterByQuest[questId] = Mathf.Max(0, v);
     }
 
+    // UI용: 특정 퀘스트의 막힌 횟수 반환
     public int GetStuckCountForUi(string questId) => GetStuck(questId);
     #endregion
 
     #region Step/Flag 관리
+    // questId로 플래그 집합 반환 (없으면 새 집합 만들어서 반환)
     private HashSet<string> GetFlagSet(string questId)
     {
         if (!flagsByQuest.TryGetValue(questId, out var set))
@@ -96,6 +100,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return set;
     }
 
+    // questId로 대화한 NPC 집합 반환 (없으면 새 집합 만들어서 반환)
     private HashSet<string> GetTalkedSet(string questId)
     {
         if (!talkedNpcByQuest.TryGetValue(questId, out var set))
@@ -106,12 +111,14 @@ public class QuestManager : SingletonComponent<QuestManager>
         return set;
     }
 
+    // 특정 NPC와 대화했다고 표시
     public void MarkTalked(string questId, NpcData npcData)
     {
         if (string.IsNullOrEmpty(questId) || npcData == null || string.IsNullOrEmpty(npcData.npcId)) return;
         GetTalkedSet(questId).Add(npcData.npcId);
     }
 
+    // questId로 step 완료 상태 집합 반환 (없으면 새 집합 만들어서 반환)
     private HashSet<string> GetDoneSet(string questId)
     {
         if (!doneStepsByQuest.TryGetValue(questId, out var set))
@@ -122,6 +129,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return set;
     }
 
+    // step의 완료 조건 검사, 충족하면 Ok 반환, 아니면 부족한 조건에 따른 결과 반환
     private ApplyStepResult CheckCompleteCondition(string questId, QuestStepData step)
     {
         var cond = step.completeCondition;
@@ -149,6 +157,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return ApplyStepResult.Ok;
     }
 
+    // stepId로 step 완료 시도 (조건 검사 후 완료 처리)
     public ApplyStepResult ApplyStep(string questId, string stepId)
     {
         if (string.IsNullOrWhiteSpace(questId) || string.IsNullOrWhiteSpace(stepId))
@@ -200,6 +209,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return ApplyStepResult.Ok;
     }
 
+    // 플레이어 입력과 일치하는 trigger 가진 step이 있으면 적용 시도
     public ApplyStepResult TryApplyStepFromInput(string questId, NPC npc, string playerInput, out string appliedStepId)
     {
         TryAutoApplySteps(questId, npc);
@@ -245,6 +255,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return result;
     }
 
+    // trigger 없이 자동으로 적용 가능한 step들 먼저 적용 (조건 충족하는 것들)
     private bool TryAutoApplySteps(string questId, NPC npc)
     {
         var quest = FindQuestById(questId);
@@ -272,6 +283,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return appliedAny;
     }
 
+    // 현재 NPC와 조건에 맞는 unlock된 step 중 우선순위가 가장 높은 step 반환 (없으면 null)
     public QuestStepData GetTopAvailableStep(string questId, NPC npc)
     {
         var quest = FindQuestById(questId);
@@ -290,6 +302,7 @@ public class QuestManager : SingletonComponent<QuestManager>
             .FirstOrDefault();
     }
 
+    // step이 잠겨있는지 검사 (NPC 조건, requires/anyOf 조건)
     private bool IsUnlockedStep(string questId, NPC npc, QuestStepData s)
     {
         if (s == null || string.IsNullOrWhiteSpace(s.stepId)) return false;
@@ -315,6 +328,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return andOk && anyOk;
     }
 
+    // 플레이어 입력이 step의 trigger와 일치하는지 검사
     private bool TriggerMatches(QuestStepData s, string input)
     {
         if (s?.trigger == null) return false;
@@ -367,6 +381,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         return false;
     }
 
+    // stepId로 step label 반환 (없으면 stepId 반환)
     public string GetStepLabel(string questId, string stepId)
     {
         var quest = FindQuestById(questId);
