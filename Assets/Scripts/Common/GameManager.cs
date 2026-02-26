@@ -13,6 +13,7 @@ public class GameManager : Singleton<GameManager>
 
 
     private Player player;
+    public Player Player => player;
 
 
 

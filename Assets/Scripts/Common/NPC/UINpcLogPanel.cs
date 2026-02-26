@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class UINpcLogPanel : MonoBehaviour
 {
     [Header("Main object")]
+    [SerializeField] private GameObject inventory;  // 인벤토리 켄버스
     [SerializeField] private GameObject logCavars;  // 이전 대화내용 보는 캔버스
     [SerializeField] private GameObject openButton; // 여는 버튼
     [SerializeField] private GameObject CloseButton;    // 닫는 버튼
@@ -17,10 +18,9 @@ public class UINpcLogPanel : MonoBehaviour
 
     [Header("Right Detail")]
     [SerializeField] private Transform chatContent;         // NPC LOG 내용 버튼
-    [SerializeField] private GameObject playerBubblePrefab; // 플레이어 말풍선 프리팹
-    [SerializeField] private GameObject npcBubblePrefab;    // NPC 말풍선 프리팹
+    [SerializeField] private GameObject playerLogBubblePrefab; // 플레이어 말풍선 프리팹
+    [SerializeField] private GameObject npcLogBubblePrefab;    // NPC 말풍선 프리팹
 
-    private NpcData currentNpc; // 현재 선택된 NPC
     private HashSet<DialogueSession> createdSessions = new HashSet<DialogueSession>();  // 이전에 만든 대화 내용인지 저장
     private DialogueSession currentSession; // 현재 열람중인 대화 내용
 
@@ -29,6 +29,7 @@ public class UINpcLogPanel : MonoBehaviour
     public void OpenLog()
     {
         openButton.SetActive(false);
+        inventory.SetActive(false);
         CloseButton.SetActive(true);
         deleteCurrentButton.SetActive(true);
         logCavars.SetActive(true);
@@ -53,6 +54,7 @@ public class UINpcLogPanel : MonoBehaviour
         currentSession = null;  // 현재 열람중인 대화 초기화
 
         openButton.SetActive(true);
+        inventory.SetActive(true);
         CloseButton.SetActive(false);
         deleteCurrentButton.SetActive(false);
         logCavars.SetActive(false);
@@ -82,10 +84,22 @@ public class UINpcLogPanel : MonoBehaviour
 
         foreach (var line in session.lines)
         {
-            var prefab = line.isPlayer ? playerBubblePrefab : npcBubblePrefab;
+            var prefab = line.isPlayer ? playerLogBubblePrefab : npcLogBubblePrefab;
 
             var go = Instantiate(prefab, chatContent);
-            go.GetComponentInChildren<TMP_Text>().text = line.message;
+
+            var bubbleUI = go.GetComponent<LogBubbleUI>();
+
+            bubbleUI.SetMessage(line.message);
+
+            if (line.isPlayer)
+            {
+                bubbleUI.SetProfile(GameManager.Instance.Player.playerProfile);
+            }
+            else
+            {
+                bubbleUI.SetProfile(session.npcData.npcProfile);
+            }
         }
     }
 

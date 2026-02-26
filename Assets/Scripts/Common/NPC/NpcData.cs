@@ -10,6 +10,8 @@ public class NpcData : ScriptableObject
 
     public string displayName;
 
+    public Sprite npcProfile;
+
     [Header("AI Prompt")]
     [TextArea] public string npcPrompt;
 

@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class Player : BaseChat
 {
+    [Header("Player Info")]
+    public Sprite playerProfile;
+
+
     [Header("Move")]
-    [SerializeField] private Animator anim;
+    private Animator anim;
     [SerializeField] private float xMoveSpeed = 5f;
     [SerializeField] private float yMoveSpeed = 3f;
     private Vector2 lastMoveDir = Vector2.down;
@@ -37,7 +41,6 @@ public class Player : BaseChat
 
     protected override void Update()
     {
-        Debug.Log(currentTeleprot);
         TalkToObject();
 
         if (isMove)

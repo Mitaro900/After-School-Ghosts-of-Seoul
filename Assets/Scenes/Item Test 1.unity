@@ -1188,7 +1188,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 87624525}
-  - component: {fileID: 87624526}
   m_Layer: 0
   m_Name: Chat Log UI
   m_TagString: Untagged
@@ -1204,36 +1203,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 87624524}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -2.40441, y: 1.4787, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1950558804}
   - {fileID: 830846366}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1487032448}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &87624526
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 87624524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 778751cb6106ba54c87292587c64eab9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UINpcLogPanel
-  logCavars: {fileID: 830846365}
-  openButton: {fileID: 1968348725}
-  CloseButton: {fileID: 2077756350}
-  deleteCurrentButton: {fileID: 883403394}
-  logContent: {fileID: 1123830341}
-  sessionButtonPrefab: {fileID: 2434679186345158509, guid: 0a4e55192ffbed140a10bc18ab56639b, type: 3}
-  chatContent: {fileID: 775141500}
-  playerBubblePrefab: {fileID: 5845070564009906991, guid: 11306c8c98c125d498a51d62a14f87e9, type: 3}
-  npcBubblePrefab: {fileID: 1833604137712513377, guid: 80009fbb9b9d3d6499aeae03ec229fc4, type: 3}
 --- !u!1 &92233900
 GameObject:
   m_ObjectHideFlags: 0
@@ -7059,7 +7037,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 87624526}
+      - m_Target: {fileID: 1487032447}
         m_TargetAssemblyTypeName: UINpcLogPanel, Assembly-CSharp
         m_MethodName: DeleteCurrentSession
         m_Mode: 1
@@ -9850,7 +9828,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2092478363}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1487032448}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -10877,6 +10855,62 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapZone
   cameraBounds: {fileID: 1481654184}
+--- !u!1 &1487032446
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1487032448}
+  - component: {fileID: 1487032447}
+  m_Layer: 0
+  m_Name: Player UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1487032447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487032446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778751cb6106ba54c87292587c64eab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UINpcLogPanel
+  inventory: {fileID: 1368314399}
+  logCavars: {fileID: 830846365}
+  openButton: {fileID: 1968348725}
+  CloseButton: {fileID: 2077756350}
+  deleteCurrentButton: {fileID: 883403394}
+  logContent: {fileID: 1123830341}
+  sessionButtonPrefab: {fileID: 2434679186345158509, guid: 0a4e55192ffbed140a10bc18ab56639b, type: 3}
+  chatContent: {fileID: 775141500}
+  playerLogBubblePrefab: {fileID: 6050570249170061177, guid: 11306c8c98c125d498a51d62a14f87e9, type: 3}
+  npcLogBubblePrefab: {fileID: 2919924642244981353, guid: 80009fbb9b9d3d6499aeae03ec229fc4, type: 3}
+--- !u!4 &1487032448
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487032446}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1368314403}
+  - {fileID: 87624525}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1530493957
 GameObject:
   m_ObjectHideFlags: 0
@@ -11852,7 +11886,7 @@ MonoBehaviour:
   Happy: {fileID: -8631900063232487059, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
   Angry: {fileID: 2612849824084976639, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
   Sad: {fileID: 2553910784619955092, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
-  anim: {fileID: 0}
+  playerProfile: {fileID: 8825244502827859042, guid: fe4ef63b47e686546930fffb560619bb, type: 3}
   xMoveSpeed: 20
   yMoveSpeed: 5
   currentItem: {fileID: 0}
@@ -14320,7 +14354,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 87624526}
+      - m_Target: {fileID: 1487032447}
         m_TargetAssemblyTypeName: UINpcLogPanel, Assembly-CSharp
         m_MethodName: OpenLog
         m_Mode: 1
@@ -15218,7 +15252,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 87624526}
+      - m_Target: {fileID: 1487032447}
         m_TargetAssemblyTypeName: UINpcLogPanel, Assembly-CSharp
         m_MethodName: CloseLog
         m_Mode: 1
@@ -16083,8 +16117,7 @@ SceneRoots:
   - {fileID: 2522914025046470314}
   - {fileID: 66592851}
   - {fileID: 1287253386}
-  - {fileID: 1368314403}
-  - {fileID: 87624525}
+  - {fileID: 1487032448}
   - {fileID: 1668139051}
   - {fileID: 744206344}
   - {fileID: 1643047810}
