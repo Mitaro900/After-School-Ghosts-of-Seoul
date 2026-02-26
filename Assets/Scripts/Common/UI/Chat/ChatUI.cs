@@ -32,10 +32,6 @@ public class ChatUI : UIBase
     [Header("Typing")]
     [SerializeField] private float typingSpeed = 0.02f; // 타이핑 속도
 
-    [Header("Choice UI")]
-    [SerializeField] private Transform choicesRoot;
-    [SerializeField] private Button choiceButtonPrefab;
-
     private NPC npc; // 대화중인 NPC 저장
     private Player player;
 
