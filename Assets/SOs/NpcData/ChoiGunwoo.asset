@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NpcData
   npcId: CHOI_GUNWOO
   displayName: "\uCD5C\uAC74\uC6B0"
+  npcProfile: {fileID: 8825244502827859042, guid: fe4ef63b47e686546930fffb560619bb, type: 3}
   npcPrompt: "\uB2F9\uC2E0\uC740 \uD559\uD3ED \uAC00\uD574\uC790 '\uCD5C\uAC74\uC6B0'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uC790\uAE30\uD569\uB9AC\uD654\uAC00 \uAC15\uD558\uACE0 \uCC45\uC784\uC744 \uD68C\uD53C\uD558\uB294
     \uD0C0\uC785\r\n- \uD798\uC758 \uC6B0\uC704\uB97C \uD3ED\uB825\uC774\uB77C\uAE30\uBCF4\uB2E4

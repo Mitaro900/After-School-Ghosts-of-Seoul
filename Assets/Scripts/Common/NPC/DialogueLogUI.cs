@@ -3,36 +3,23 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public class UINpcLogPanel : MonoBehaviour
+public class DialogueLogUI : UIBase
 {
-    [Header("Main object")]
-    [SerializeField] private GameObject inventory;  // 인벤토리 켄버스
-    [SerializeField] private GameObject logCavars;  // 이전 대화내용 보는 캔버스
-    [SerializeField] private GameObject openButton; // 여는 버튼
-    [SerializeField] private GameObject CloseButton;    // 닫는 버튼
-    [SerializeField] private GameObject deleteCurrentButton;    // 세션 삭제 버튼
-
     [Header("Left List")]
-    [SerializeField] private Transform logContent;          // NPC LOG 선택 버튼
-    [SerializeField] private GameObject sessionButtonPrefab; // 세션 버튼 프리팹
+    [SerializeField] private Transform logContent;              // NPC LOG 선택 버튼
+    [SerializeField] private GameObject sessionButtonPrefab;    // 세션 버튼 프리팹
 
     [Header("Right Detail")]
-    [SerializeField] private Transform chatContent;         // NPC LOG 내용 버튼
-    [SerializeField] private GameObject playerLogBubblePrefab; // 플레이어 말풍선 프리팹
-    [SerializeField] private GameObject npcLogBubblePrefab;    // NPC 말풍선 프리팹
+    [SerializeField] private Transform chatContent;             // NPC LOG 내용 버튼
+    [SerializeField] private GameObject playerLogBubblePrefab;  // 플레이어 말풍선 프리팹
+    [SerializeField] private GameObject npcLogBubblePrefab;     // NPC 말풍선 프리팹
 
-    private HashSet<DialogueSession> createdSessions = new HashSet<DialogueSession>();  // 이전에 만든 대화 내용인지 저장
+    private HashSet<DialogueSession> createdSessions = new HashSet<DialogueSession>(); // 이전에 만든 대화 내용인지 저장
     private DialogueSession currentSession; // 현재 열람중인 대화 내용
 
-
-    // 버튼 누를시 Log UI창 활성화 (저장된 NPC대화 데이터도 가져옴)
-    public void OpenLog()
+    public override void ShowUI()
     {
-        openButton.SetActive(false);
-        inventory.SetActive(false);
-        CloseButton.SetActive(true);
-        deleteCurrentButton.SetActive(true);
-        logCavars.SetActive(true);
+        base.ShowUI();
 
         // ChatLogManager에 등록된 모든 NPC 데이터 가져오기
         foreach (var npcPair in ChatLogManager.Instance.GetAllNpcSessions())
@@ -49,15 +36,11 @@ public class UINpcLogPanel : MonoBehaviour
         }
     }
 
-    public void CloseLog()
+    public override void OnClickCloseButton()
     {
-        currentSession = null;  // 현재 열람중인 대화 초기화
+        currentSession = null; // 현재 열람중인 대화 초기화
 
-        openButton.SetActive(true);
-        inventory.SetActive(true);
-        CloseButton.SetActive(false);
-        deleteCurrentButton.SetActive(false);
-        logCavars.SetActive(false);
+        base.OnClickCloseButton();
     }
 
     // 왼쪽 세션 버튼 생성

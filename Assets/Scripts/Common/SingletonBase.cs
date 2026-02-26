@@ -48,18 +48,18 @@ namespace Singleton
     /// </summary>
     public sealed class SingletonGateHook : MonoBehaviour
     {
-        private static bool s_installed;
+        private static SingletonGateHook s_instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoInstall()
         {
-            if (s_installed) return;
+            if (s_instance != null) return;
 
             var go = new GameObject("[Bootstrap] SingletonGateHook");
             DontDestroyOnLoad(go);
 
             go.AddComponent<SingletonGateHook>();
-            s_installed = true;
+            s_instance = go.GetComponent<SingletonGateHook>();
 
             // 기본 상태(선택)
             SingletonGate.Enable();
@@ -68,19 +68,15 @@ namespace Singleton
         private void Awake()
         {
             // 만약 씬에 수동으로도 넣었을 때 중복 제거
-            if (s_installed && !ReferenceEquals(gameObject, null))
+            if (s_instance != null && s_instance != this)
             {
-                // AutoInstall에서 이미 만든 경우, 씬 배치본은 제거
-                // (AutoInstall이 먼저 실행되므로 대개 여기로 들어옴)
-                if (gameObject.name != "[Bootstrap] SingletonGateHook")
-                {
-                    Destroy(gameObject);
-                    return;
-                }
+                Destroy(gameObject);
             }
-
-            s_installed = true;
-            DontDestroyOnLoad(gameObject);
+            else
+            {
+                s_instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
         }
 
         private void OnApplicationQuit()
@@ -108,7 +104,7 @@ namespace Singleton
 
 			protected static void PushSingleton(SingletonData _obj)
 			{
-				if (null != _obj)
+				if (_obj != null)
 				{
                     if (!singletonSet.Add(_obj))
                         return;
@@ -119,12 +115,14 @@ namespace Singleton
 
 			public static bool InitSingletons()
 			{
-				int count = singletonList.Count;
+                singletonList.RemoveAll(x => x == null);
+
+                int count = singletonList.Count;
 				for (int n = 0; n < count; ++n)
 				{
-					if (null != singletonList[n])
+					if (singletonList[n] != null)
 					{
-						if (false == singletonList[n].Initialize())
+						if (singletonList[n].Initialize() == false)
 							return false;
 					}
 				}
@@ -135,6 +133,7 @@ namespace Singleton
 			public static void ReleaseSingletons()
 			{
                 SingletonGate.BeginRelease();
+                singletonList.RemoveAll(x => x == null);
 
                 try
                 {
@@ -142,7 +141,7 @@ namespace Singleton
                     int count = singletonList.Count;
                     for (int n = count - 1; n >= 0; --n)
                     {
-                        if (null != singletonList[n])
+                        if (singletonList[n] != null)
                         {
                             singletonList[n].ReleaseSingleton();
                         }
@@ -162,7 +161,7 @@ namespace Singleton
 
 		public abstract class SingletonData<T> : SingletonData where T : SingletonData, new()
 		{
-			private static T m_instance = null;
+			protected static T m_instance = null;
 			public static T Instance
 			{
 				get
@@ -176,7 +175,7 @@ namespace Singleton
 #endif
                     }
 
-                    if (null == m_instance)
+                    if (m_instance == null)
 					{
 						m_instance = new T();
 						PushSingleton(m_instance);
@@ -189,7 +188,25 @@ namespace Singleton
 
 			public bool IsInitialized { get => _initialized; }
 
-			public override bool Initialize()
+            public static bool HasInstance
+            {
+                get
+                {
+                    if (SingletonGate.IsBlocked) return false;
+                    return m_instance != null;
+                }
+            }
+
+            public static bool TryGetInstance(out T inst)
+            {
+                inst = null;
+                if (SingletonGate.IsBlocked) return false;
+
+                inst = m_instance;
+                return inst != null;
+            }
+
+            public override bool Initialize()
 			{
 				if (!_initialized)
 				{
@@ -246,7 +263,7 @@ namespace Singleton
 
             protected static void PushSingleton(SingletonComponent _obj)
 			{
-				if (null != _obj)
+				if (_obj != null)
 				{
 					InitInstanceDontDestroyParent();
 
@@ -272,11 +289,13 @@ namespace Singleton
             /// </summary>
 			public static bool InitSingletons()
 			{
-				int count = singletonList.Count;
+                singletonList.RemoveAll(x => x == null);
+
+                int count = singletonList.Count;
 
                 for (int n = 0; n < count; n++)
                 {
-                    if (null != singletonList[n])
+                    if (singletonList[n] != null)
                     {
                         singletonList[n].EnsureAwakeSingletonOnce();
                     }
@@ -284,9 +303,9 @@ namespace Singleton
 
                 for (int n = 0; n < count; ++n)
 				{
-					if (null != singletonList[n])
+					if (singletonList[n] != null)
 					{
-						if (false == singletonList[n].Initialize())
+						if (singletonList[n].Initialize() == false)
 							return false;
 					}
 				}
@@ -297,6 +316,7 @@ namespace Singleton
 			public static void ReleaseSingletons()
 			{
                 SingletonGate.BeginRelease();
+                singletonList.RemoveAll(x => x == null);
                 _isProcessing_Release = true;
 
                 try
@@ -306,7 +326,7 @@ namespace Singleton
                     //코루틴 종료
                     for (int n = count - 1; n >= 0; --n)
                     {
-                        if (null != singletonList[n])
+                        if (singletonList[n] != null)
                             singletonList[n].StopAllCoroutines();
                     }
 
@@ -315,14 +335,14 @@ namespace Singleton
                     for (int n = count - 1; n >= 0; --n)
                     {
                         SingletonComponent _component = singletonList[n];
-                        if (null != _component && _component.gameObject.activeInHierarchy)
+                        if (_component != null && _component.gameObject.activeInHierarchy)
                             _component.gameObject.SetActive(false);
                     }
 
                     //비활성화가 완료되면 모두 해제
                     for (int n = count - 1; n >= 0; --n)
                     {
-                        if (null != singletonList[n])
+                        if (singletonList[n] != null)
                         {
                             singletonList[n].ResetAwakeSingletonFlag();
                             singletonList[n].ReleaseSingleton();
@@ -367,7 +387,7 @@ namespace Singleton
 
 		public abstract class SingletonComponent<T> : SingletonComponent where T : MonoBehaviour
 		{
-			private static T m_instance;
+			protected static T m_instance;
 
 			public static bool IsQuitting()
 			{
@@ -420,7 +440,25 @@ namespace Singleton
 			private bool _initialized = false;
 			public bool isInitialized { get { return _initialized; } }
 
-			public override bool Initialize()
+            public static bool HasInstance
+            {
+                get
+                {
+                    if (IsQuitting()) return false;
+                    return m_instance != null;
+                }
+            }
+
+            public static bool TryGetInstance(out T inst)
+            {
+                inst = null;
+                if (IsQuitting()) return false;
+
+                inst = m_instance;
+                return inst != null;
+            }
+
+            public override bool Initialize()
 			{
 				if (!_initialized)
 				{
@@ -458,7 +496,7 @@ namespace Singleton
 			{
 				useGUILayout = false;
 
-				if (null == m_instance)
+				if (m_instance == null)
 				{
 					m_instance = this as T;
 					PushSingleton(m_instance as SingletonComponent);

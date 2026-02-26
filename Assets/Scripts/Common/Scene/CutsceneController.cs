@@ -1,3 +1,4 @@
+using Singleton.Component;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Playables;
@@ -8,14 +9,30 @@ public enum CutsceneType
     Ending
 }
 
-public class CutsceneController : Singleton<CutsceneController>
+public class CutsceneController : SingletonComponent<CutsceneController>
 {
     [SerializeField] private PlayableDirector director;
     [SerializeField] private PlayableAsset introTimeline;
     [SerializeField] private PlayableAsset endingTimeline;
-    [SerializeField] private Player player; // 플레이어 스크립트
 
     private bool isPlaying = false;
+
+    #region Singleton
+    protected override void AwakeInstance()
+    {
+        
+    }
+
+    protected override bool InitInstance()
+    {
+        return true;
+    }
+
+    protected override void ReleaseInstance()
+    {
+        
+    }
+    #endregion
 
     void Update()
     {
@@ -32,7 +49,7 @@ public class CutsceneController : Singleton<CutsceneController>
         isPlaying = true;
 
         // 플레이어 움직임 막기
-        player.PlayerMove(false);
+        GameManager.Instance.Player.PlayerMove(false);
 
         // 타임라인 선택
         director.playableAsset =
@@ -60,6 +77,6 @@ public class CutsceneController : Singleton<CutsceneController>
         isPlaying = false;
 
         // 플레이어 다시 활성화
-        player.PlayerMove(true);
+        GameManager.Instance.Player.PlayerMove(true);
     }
 }

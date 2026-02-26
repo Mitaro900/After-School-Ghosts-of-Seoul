@@ -21,7 +21,7 @@ public class UIManager : SingletonComponent<UIManager>
     #region Singleton
     protected override void AwakeInstance()
     {
-        Initialize();
+
     }
 
     protected override bool InitInstance()

@@ -38,7 +38,7 @@ public class QuestObject : MonoBehaviour
             // 조건을 만족했다면 완료 대사 아니라면 진행 중 대사 반환
             if (completed)
             {
-                InventoryManager.Instance.RemoveItem(questData.requiredItem);   // 해당 완료 아이템 제거
+                InventoryData.Instance.RemoveItem(questData.requiredItem);   // 해당 완료 아이템 제거
                 Destroy(gameObject);
                 return questCompleted;
             }

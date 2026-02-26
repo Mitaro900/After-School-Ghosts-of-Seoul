@@ -1,5 +1,5 @@
+using Singleton.Component;
 using System.Collections.Generic;
-using UnityEngine;
 
 // 대화 한 줄 정보를 담는 클래스
 public class DialogueLine
@@ -24,7 +24,7 @@ public class DialogueSession
 }
 
 // 채팅 로그를 관리하는 매니저 클래스
-public class ChatLogManager : Singleton<ChatLogManager>
+public class ChatLogManager : SingletonComponent<ChatLogManager>
 {
     // NPC별 대화 세션을 저장하는 Dictionary
     private Dictionary<NpcData, List<DialogueSession>> npcSessions
@@ -32,6 +32,23 @@ public class ChatLogManager : Singleton<ChatLogManager>
 
     // 현재 진행 중인 대화 세션
     private DialogueSession currentSession;
+
+    #region Singleton
+    protected override void AwakeInstance()
+    {
+        
+    }
+
+    protected override bool InitInstance()
+    {
+        return true;
+    }
+
+    protected override void ReleaseInstance()
+    {
+        
+    }
+    #endregion
 
     // 대화 시작
     public void StartSession(NpcData npcData)

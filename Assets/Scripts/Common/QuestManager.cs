@@ -51,7 +51,7 @@ public class QuestManager : SingletonComponent<QuestManager>
     #region Singleton
     protected override void AwakeInstance()
     {
-        Initialize();
+
     }
 
     protected override bool InitInstance()
@@ -137,7 +137,7 @@ public class QuestManager : SingletonComponent<QuestManager>
 
         if (cond.requiredItem != null)
         {
-            if (!InventoryManager.Instance.HasItem(cond.requiredItem))
+            if (!InventoryData.Instance.HasItem(cond.requiredItem))
                 return ApplyStepResult.MissingItem;
         }
 
@@ -452,7 +452,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         // 아이템 조건이 있다면 검사
         if (quest.requiredItem != null)
         {
-            if (!InventoryManager.Instance.HasItem(quest.requiredItem))
+            if (!InventoryData.Instance.HasItem(quest.requiredItem))
                 return false;
         }
 
@@ -489,7 +489,7 @@ public class QuestManager : SingletonComponent<QuestManager>
         if (quest.givesReward)
         {
             foreach (var item in quest.rewardItems)
-                InventoryManager.Instance.AddItem(item);
+                InventoryData.Instance.AddItem(item);
         }
 
         Debug.Log($"퀘스트 완료: {quest.questName}");

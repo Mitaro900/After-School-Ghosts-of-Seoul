@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NpcData
   npcId: KIM_YEONWOO
   displayName: "\uAE40\uC5F0\uC6B0"
+  npcProfile: {fileID: -4317739304799030588, guid: 1a0abafa26bcef540aa5cf0f07c91061, type: 3}
   npcPrompt: "\uB2F9\uC2E0\uC740 \uD559\uD3ED \uD53C\uD574\uC790 \uC720\uB839 '\uAE40\uC5F0\uC6B0'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uC870\uC6A9\uD558\uACE0 \uC815\uC911\uD558\uC9C0\uB9CC, \uAC10\uC815\uC758 \uACE8\uC774
     \uAE4A\uC74C\r\n- \uC2A4\uC2A4\uB85C\uB97C \uD53C\uD574\uC790\uB77C\uACE0 \uAC15\uC870\uD558\uC9C0

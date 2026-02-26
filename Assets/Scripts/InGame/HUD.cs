@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,17 +10,36 @@ public class InventorySlot
     public ItemData itemData;
 }
 
-public class InventoryManager : Singleton<InventoryManager>
+public class HUD : MonoBehaviour
 {
-    [SerializeField] private Player player;
-    public List<InventorySlot> slots;
+    [SerializeField] private GameObject hudPanel;
+
+    private InventoryData _inventory;
+
+    [SerializeField] private List<InventorySlot> slots;
 
     private void Start()
     {
         SetupButtons();
-        RefreshUI();
     }
 
+    private void OnEnable()
+    {
+        if(InventoryData.TryGetInstance(out _inventory))
+        {
+            _inventory.OnInventoryChanged += RefreshUI;
+            RefreshUI();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_inventory != null)
+        {
+            _inventory.OnInventoryChanged -= RefreshUI;
+        }
+        _inventory = null;
+    }
 
     // 버튼 등록
     private void SetupButtons()
@@ -33,7 +51,6 @@ public class InventoryManager : Singleton<InventoryManager>
         }
     }
 
-
     // 아이템 클릭시 관련 대사
     private void OnSlotClicked(int index)
     {
@@ -41,30 +58,22 @@ public class InventoryManager : Singleton<InventoryManager>
 
         if (slot.itemData != null)
         {
-            player.TalkToSlotItem(slot.itemData.ItemSlotPrompt);
+            GameManager.Instance.Player.TalkToSlotItem(slot.itemData.ItemSlotPrompt);
         }
     }
-
 
     // 아이템 등록 (Item, QuestManager 사용중)
     public bool AddItem(ItemData newItem)
     {
-        foreach (var slot in slots)
+        if(_inventory.AddItem(newItem))
         {
-            if (slot.itemData == null)
-            {
-                slot.itemData = newItem;
-                RefreshUI();
+            QuestManager.Instance.CheckQuestComplete(newItem.ItemName);
 
-                QuestManager.Instance.CheckQuestComplete(newItem.ItemName);
-
-                return true;
-            }
+            return true;
         }
 
         return false;
     }
-
 
     // 아이템 제거
     public void RemoveItems(List<ItemData> items)
@@ -77,28 +86,8 @@ public class InventoryManager : Singleton<InventoryManager>
 
     public void RemoveItem(ItemData item)
     {
-        for (int i = 0; i < slots.Count; i++)
-        {
-            if (slots[i].itemData == item)
-            {
-                // 현재 칸 비우기
-                slots[i].itemData = null;
-
-                // 뒤에 있는 아이템들 앞으로 당기기
-                for (int j = i; j < slots.Count - 1; j++)
-                {
-                    slots[j].itemData = slots[j + 1].itemData;
-                }
-
-                // 마지막 칸 비우기
-                slots[slots.Count - 1].itemData = null;
-
-                RefreshUI();
-                return;
-            }
-        }
+        _inventory.RemoveItem(item);
     }
-
 
     // 현재 아이템을 들고있는지 확인 (QuestManager에서 사용)
     public bool HasAllItems(List<ItemData> items)
@@ -122,10 +111,14 @@ public class InventoryManager : Singleton<InventoryManager>
         return false;
     }
 
-
     // 아이템 이미지 등록 및 제거
     private void RefreshUI()
     {
+        for (int i = 0; i < _inventory.Items.Count; i++)
+        {
+            slots[i].itemData = _inventory.Items[i];
+        }
+
         foreach (var slot in slots)
         {
             if (slot.itemData == null)
@@ -138,5 +131,25 @@ public class InventoryManager : Singleton<InventoryManager>
                 slot.itemImage.sprite = slot.itemData.ItemImage;
             }
         }
+    }
+
+    public void OpenLog()
+    {
+        var uiData = new UIBaseData
+        {
+            OnShow = () => HideHUD(),
+            OnClose = () => ShowHUD()
+        };
+        UIManager.Instance.OpenUI<DialogueLogUI>(uiData);
+    }
+
+    public void ShowHUD()
+    {
+        hudPanel.SetActive(true);
+    }
+
+    public void HideHUD()
+    {
+        hudPanel.SetActive(false);
     }
 }

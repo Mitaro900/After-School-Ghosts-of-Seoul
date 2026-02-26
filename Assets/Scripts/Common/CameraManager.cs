@@ -1,6 +1,7 @@
+using Singleton.Component;
 using UnityEngine;
 
-public class CameraManager : Singleton<CameraManager>
+public class CameraManager : SingletonComponent<CameraManager>
 {
     [SerializeField] private Camera cam;
     private Transform Target;
@@ -11,13 +12,23 @@ public class CameraManager : Singleton<CameraManager>
     private float camHeight;
     private float camWidth;
 
-    protected override void Awake()
+    #region Singleton
+    protected override void AwakeInstance()
     {
-        base.Awake();
-
         camHeight = cam.orthographicSize;
         camWidth = camHeight * cam.aspect;
     }
+
+    protected override bool InitInstance()
+    {
+        return true;
+    }
+
+    protected override void ReleaseInstance()
+    {
+        
+    }
+    #endregion
 
     private void LateUpdate()
     {
@@ -63,5 +74,4 @@ public class CameraManager : Singleton<CameraManager>
             cam.transform.position.z
         );
     }
-
 }

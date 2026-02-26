@@ -18,7 +18,7 @@ public class OpenAIManager : SingletonComponent<OpenAIManager>
     #region Singleton
     protected override void AwakeInstance()
     {
-        Initialize();
+
     }
 
     protected override bool InitInstance()

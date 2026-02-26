@@ -297,14 +297,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 778751cb6106ba54c87292587c64eab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UINpcLogPanel
+  inventory: {fileID: 1368314399}
   logCavars: {fileID: 830846365}
   openButton: {fileID: 1968348725}
   CloseButton: {fileID: 2077756350}
+  deleteCurrentButton: {fileID: 0}
   logContent: {fileID: 1123830341}
   sessionButtonPrefab: {fileID: 2434679186345158509, guid: 0a4e55192ffbed140a10bc18ab56639b, type: 3}
   chatContent: {fileID: 775141500}
-  playerBubblePrefab: {fileID: 5845070564009906991, guid: 11306c8c98c125d498a51d62a14f87e9, type: 3}
-  npcBubblePrefab: {fileID: 1833604137712513377, guid: 80009fbb9b9d3d6499aeae03ec229fc4, type: 3}
+  playerLogBubblePrefab: {fileID: 0}
+  npcLogBubblePrefab: {fileID: 0}
 --- !u!1 &125314920
 GameObject:
   m_ObjectHideFlags: 0
@@ -5285,7 +5287,7 @@ MonoBehaviour:
   Happy: {fileID: -8631900063232487059, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
   Angry: {fileID: 2612849824084976639, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
   Sad: {fileID: 2553910784619955092, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
-  anim: {fileID: 0}
+  playerProfile: {fileID: 0}
   xMoveSpeed: 5
   yMoveSpeed: 3
   currentItem: {fileID: 0}
