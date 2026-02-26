@@ -48,6 +48,9 @@ public class QuestManager : SingletonComponent<QuestManager>
     // questId → 특정 step에서 막힌 횟수
     private Dictionary<string, int> stuckCounterByQuest = new();
 
+    // 퀘스트 변경 이벤트
+    public event System.Action<string> OnQuestUpdated;
+
     #region Singleton
     protected override void AwakeInstance()
     {
@@ -194,7 +197,7 @@ public class QuestManager : SingletonComponent<QuestManager>
             return condResult;
 
         // 완료 처리
-        done.Add(stepId);
+        CompleteStep(questId, step);
 
         // 효과
         if (step.onComplete != null)
@@ -429,7 +432,10 @@ public class QuestManager : SingletonComponent<QuestManager>
 
         // 이미 진행 중 목록에 들어있는 퀘스트면 또 추가하지 않음
         if (!activeQuests.Contains(quest))
+        {
             activeQuests.Add(quest);
+            OnQuestUpdated?.Invoke(questId);
+        }
 
         Debug.Log($"퀘스트 시작: {quest.questName}");
     }
@@ -492,6 +498,8 @@ public class QuestManager : SingletonComponent<QuestManager>
                 InventoryData.Instance.AddItem(item);
         }
 
+        OnQuestUpdated?.Invoke(quest.questId);
+
         Debug.Log($"퀘스트 완료: {quest.questName}");
     }
     #endregion
@@ -550,4 +558,36 @@ public class QuestManager : SingletonComponent<QuestManager>
         return "";
     }
     #endregion
+
+    public QuestStepData GetTopAvailableStepForLog(string questId)
+    {
+        var quest = FindQuestById(questId);
+        if (quest == null || !quest.useSteps)
+            return null;
+
+        if (GetQuestState(questId) != QuestState.InProgress)
+            return null;
+
+        return quest.steps
+            .Where(s => IsUnlockedStep(questId, null, s))
+            .OrderByDescending(s => s.priority)
+            .FirstOrDefault();
+    }
+
+    public List<string> GetDoneSteps(string questId)
+    {
+        return GetDoneSet(questId).ToList();
+    }
+
+    private void CompleteStep(string questId, QuestStepData step)
+    {
+        var done = GetDoneSet(questId);
+
+        if (done.Contains(step.stepId))
+            return;
+
+        done.Add(step.stepId);
+
+        OnQuestUpdated?.Invoke(questId);
+    }
 }

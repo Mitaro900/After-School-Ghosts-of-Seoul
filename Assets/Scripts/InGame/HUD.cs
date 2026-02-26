@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,28 +18,38 @@ public class HUD : MonoBehaviour
     private InventoryData _inventory;
 
     [SerializeField] private List<InventorySlot> slots;
+    [SerializeField] private TextMeshProUGUI questinfo1;
+    [SerializeField] private TextMeshProUGUI questinfo2;
 
     private void Start()
     {
+        questinfo1.text = "";
+        questinfo2.text = "";
         SetupButtons();
     }
 
     private void OnEnable()
     {
-        if(InventoryData.TryGetInstance(out _inventory))
+        if (InventoryData.TryGetInstance(out _inventory))
         {
             _inventory.OnInventoryChanged += RefreshUI;
             RefreshUI();
         }
+
+        QuestManager.Instance.OnQuestUpdated += OnQuestUpdated;
     }
 
     private void OnDisable()
     {
         if (_inventory != null)
-        {
             _inventory.OnInventoryChanged -= RefreshUI;
-        }
-        _inventory = null;
+
+        QuestManager.Instance.OnQuestUpdated -= OnQuestUpdated;
+    }
+
+    private void OnQuestUpdated(string questId)
+    {
+        RefreshQuestLog();
     }
 
     // 버튼 등록
@@ -135,6 +146,8 @@ public class HUD : MonoBehaviour
 
     public void OpenLog()
     {
+        RefreshQuestLog();
+
         var uiData = new UIBaseData
         {
             OnShow = () => HideHUD(),
@@ -151,5 +164,41 @@ public class HUD : MonoBehaviour
     public void HideHUD()
     {
         hudPanel.SetActive(false);
+    }
+
+    public void RefreshQuestLog()
+    {
+        var quests = QuestManager.Instance.GetActiveQuests();
+
+        foreach (var quest in quests)
+        {
+            string questId = quest.questId;
+
+            var currentStep =
+                QuestManager.Instance.GetTopAvailableStepForLog(questId);
+
+            string currentObjective =
+                currentStep != null
+                    ? currentStep.label
+                    : "진행 중 목표 없음";
+
+            questinfo1.text = $"퀘스트: {quest.questName}";
+            questinfo2.text = $"현재 목표: {currentObjective}";
+
+            var doneSteps =
+                QuestManager.Instance.GetDoneSteps(questId);
+
+            foreach (var stepId in doneSteps)
+            {
+                string label =
+                    QuestManager.Instance.GetStepLabel(questId, stepId);
+
+                Debug.Log($"완료: {label}");
+
+                questinfo1.text = "";
+                questinfo2.text = "";
+
+            }
+        }
     }
 }
