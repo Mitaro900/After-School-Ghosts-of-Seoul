@@ -458,7 +458,7 @@ MonoBehaviour:
   Happy: {fileID: -8631900063232487059, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
   Angry: {fileID: 2612849824084976639, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
   Sad: {fileID: 2553910784619955092, guid: 8bbdaded7ab3a364fbc4a3df8b121561, type: 3}
-  playerProfile: {fileID: 8825244502827859042, guid: fe4ef63b47e686546930fffb560619bb, type: 3}
+  playerProfile: {fileID: -7081404512699209381, guid: 7567aa16b4b498d4ea9ba95ea4ff9973, type: 3}
   xMoveSpeed: 20
   yMoveSpeed: 5
   currentItem: {fileID: 0}
