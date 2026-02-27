@@ -13,8 +13,13 @@ public enum Music
 
 public enum SFX
 {
-    ui_open,
     ui_close,
+    stair_move,
+    door_open,
+    text_press,
+    ui_delete1,ui_delete2,
+    walk1,walk2,walk3,walk4,
+    ui_open1, ui_open2, ui_open3, ui_open4, ui_open5,
     COUNT
 }
 
@@ -180,5 +185,19 @@ public class AudioManager : SingletonComponent<AudioManager>
         {
             audioSourceItem.Value.mute = _mute;
         }
+    }
+
+    public void PlaySFXWithPitch(SFX sfx, float pitch)
+    {
+        if (!m_SFXPlayer.ContainsKey(sfx))
+        {
+            Debug.LogError($"Invalid clip name. ({sfx})");
+            return;
+        }
+
+        var source = m_SFXPlayer[sfx];
+
+        source.pitch = pitch;
+        source.PlayOneShot(source.clip);
     }
 }

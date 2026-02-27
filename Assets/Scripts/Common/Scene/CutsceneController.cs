@@ -94,30 +94,12 @@ public class CutsceneController : SingletonComponent<CutsceneController>
         if (currentType == CutsceneType.Intro)
         {
             SceneLoader.Instance.LoadScene(SceneType.InGame);
+            AudioManager.Instance.PlayBGM(Music.ingame);
         }
         else
         {
             SceneLoader.Instance.LoadScene(SceneType.Ending);
+            AudioManager.Instance.PlayBGM(Music.ending);
         }
     }
-
-    //private IEnumerator Fade(float start, float end)
-    //{
-    //    float time = 0f;
-    //    Color color = fadeImage.color;
-
-    //    while (time < fadeDuration)
-    //    {
-    //        time += Time.deltaTime;
-    //        float alpha = Mathf.Lerp(start, end, time / fadeDuration);
-
-    //        color.a = alpha;
-    //        fadeImage.color = color;
-
-    //        yield return null;
-    //    }
-
-    //    color.a = end;
-    //    fadeImage.color = color;
-    //}
 }

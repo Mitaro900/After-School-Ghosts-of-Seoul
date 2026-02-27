@@ -13,6 +13,7 @@ public class InventorySlot
 
 public class HUD : MonoBehaviour
 {
+    public static HUD Instance;
     [SerializeField] private GameObject hudPanel;
 
     private InventoryData _inventory;
@@ -20,6 +21,11 @@ public class HUD : MonoBehaviour
     [SerializeField] private List<InventorySlot> slots;
     [SerializeField] private TextMeshProUGUI questinfo1;
     [SerializeField] private TextMeshProUGUI questinfo2;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -35,16 +41,12 @@ public class HUD : MonoBehaviour
             _inventory.OnInventoryChanged += RefreshUI;
             RefreshUI();
         }
-
-        QuestManager.Instance.OnQuestUpdated += OnQuestUpdated;
     }
 
     private void OnDisable()
     {
         if (_inventory != null)
             _inventory.OnInventoryChanged -= RefreshUI;
-
-        QuestManager.Instance.OnQuestUpdated -= OnQuestUpdated;
     }
 
     private void OnQuestUpdated(string questId)
@@ -123,24 +125,29 @@ public class HUD : MonoBehaviour
     }
 
     // 아이템 이미지 등록 및 제거
-    private void RefreshUI()
+    public void RefreshUI()
     {
-        for (int i = 0; i < _inventory.Items.Count; i++)
+        for (int i = 0; i < slots.Count; i++)
         {
-            slots[i].itemData = _inventory.Items[i];
-        }
-
-        foreach (var slot in slots)
-        {
-            if (slot.itemData == null)
+            if (i < _inventory.Items.Count)
             {
-                slot.itemImage.gameObject.SetActive(false);
+                slots[i].itemData = _inventory.Items[i];
+                slots[i].itemImage.sprite = slots[i].itemData.ItemImage;
+                slots[i].itemImage.gameObject.SetActive(true);
             }
             else
             {
-                slot.itemImage.gameObject.SetActive(true);
-                slot.itemImage.sprite = slot.itemData.ItemImage;
+                slots[i].itemData = null;
+                slots[i].itemImage.gameObject.SetActive(false);
             }
+        }
+    }
+
+    public void AddItemToHUD(ItemData newItem)
+    {
+        if (_inventory.AddItem(newItem))
+        {
+            RefreshUI();
         }
     }
 
@@ -154,6 +161,15 @@ public class HUD : MonoBehaviour
             OnClose = () => ShowHUD()
         };
         UIManager.Instance.OpenUI<DialogueLogUI>(uiData);
+
+        if (Random.value < 0.5f)
+        {
+            AudioManager.Instance.PlaySFX(SFX.ui_open1);
+        }
+        else
+        {
+            AudioManager.Instance.PlaySFX(SFX.ui_open2);
+        }
     }
 
     public void ShowHUD()

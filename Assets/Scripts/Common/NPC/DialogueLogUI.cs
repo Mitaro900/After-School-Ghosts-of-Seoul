@@ -21,7 +21,7 @@ public class DialogueLogUI : UIBase
     {
         base.ShowUI();
 
-        AudioManager.Instance.PlaySFX(SFX.ui_open);
+        AudioManager.Instance.PlaySFX(SFX.ui_open1);
 
         // ChatLogManager에 등록된 모든 NPC 데이터 가져오기
         foreach (var npcPair in ChatLogManager.Instance.GetAllNpcSessions())
@@ -41,7 +41,8 @@ public class DialogueLogUI : UIBase
     public override void OnClickCloseButton()
     {
         currentSession = null; // 현재 열람중인 대화 초기화
-
+        AudioManager.Instance.PlaySFX(SFX.ui_close);
+        ClearChatView();
         base.OnClickCloseButton();
     }
 
@@ -62,6 +63,15 @@ public class DialogueLogUI : UIBase
     {
         if (currentSession == session)
             return;
+
+        if (Random.value < 0.5f)
+        {
+            AudioManager.Instance.PlaySFX(SFX.ui_open3);
+        }
+        else
+        {
+            AudioManager.Instance.PlaySFX(SFX.ui_open4);
+        }
 
         currentSession = session;
 
@@ -100,6 +110,15 @@ public class DialogueLogUI : UIBase
     {
         if (currentSession == null)
             return;
+
+        if (Random.value < 0.5f)
+        {
+            AudioManager.Instance.PlaySFX(SFX.ui_delete1);
+        }
+        else
+        {
+            AudioManager.Instance.PlaySFX(SFX.ui_delete2);
+        }
 
         ChatLogManager.Instance.RemoveSession(currentSession);
 

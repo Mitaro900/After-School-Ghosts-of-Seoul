@@ -72,6 +72,7 @@ public class ChatUI : UIBase
         // 타이핑 중이 아니라면 채팅창 나가기 허용
         if (npc != null && PlayerInputManager.Instance.cancelAction.WasPressedThisFrame() && !_busy)
         {
+            AudioManager.Instance.PlaySFX(SFX.ui_close);
             npc.OffInteract();
             player.PlayerMove(true);    // 플레이어 움직임 허용
         }
@@ -195,34 +196,6 @@ public class ChatUI : UIBase
             ";
         }
 
-        //var state = QuestManager.Instance.GetQuestState(questId);
-
-        //// 퀘스트 상태에 따라 npcPrompt 가져오기
-        //if (state == QuestState.NotStarted)
-        //{
-        //    questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
-        //    Debug.Log(questNpcPrompt);
-
-        //    // 플레이어가 긍정적인 말 입력 시 퀘스트 시작
-        //    if (IsPlayerAccepting(playerText))
-        //    {
-        //        QuestManager.Instance.StartQuest(questId);
-        //        questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId); // InProgress 대사로 갱신
-        //    }
-        //}
-        //else if (state == QuestState.InProgress)
-        //{
-        //    // 아이템 가져온것을 확인 후 완료로 변경
-        //    if (QuestManager.Instance.CheckQuestComplete(questId))
-        //    {
-        //        questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);   // Completed 대사로 갱신
-        //    }
-        //}
-        //else
-        //{
-        //    questNpcPrompt = QuestManager.Instance.GetQuestNpcPrompt(questId);
-        //}
-
         // AI 프롬프트 구성
         string finalPrompt = $@"
         [기본 설정]
@@ -315,6 +288,8 @@ public class ChatUI : UIBase
         if (sender != null)
             targetProfile.sprite = sender.GetEmotionSprite(currentEmotion);
 
+        int visibleCharCount = 0;
+
         for (int i = 0; i < text.Length; i++)
         {
             if (text[i] == '<')
@@ -328,9 +303,18 @@ public class ChatUI : UIBase
                 }
             }
 
-            tmp.text += text[i];
+            char c = text[i];
+            tmp.text += c;
+            visibleCharCount++;
+
             UpdateBubbleSize(bubble);
             ScrollToBottom();
+
+            if (!char.IsWhiteSpace(c) && i % 3 == 0)
+            {
+                float randomPitch = Random.Range(0.8f, 1.3f);
+                AudioManager.Instance.PlaySFXWithPitch(SFX.text_press, randomPitch);
+            }
 
             yield return new WaitForSeconds(speed);
         }
@@ -356,19 +340,6 @@ public class ChatUI : UIBase
         return false;
     }
 
-    // 플레이어 입력 긍정 체크 함수
-    private bool IsPlayerAccepting(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input)) return false;
-
-        string lowerInput = input.Trim().ToLower();
-        string[] positiveWords = { "수락", "좋아요", "응", "알겠습니다", "그래", "네" };
-
-        foreach (var word in positiveWords)
-            if (lowerInput.Contains(word)) return true;
-
-        return false;
-    }
 
     // 퀘스트 진행 상황에 따른 시스템 메시지 생성
     private string BuildSystemAppend(ApplyStepResult result, string questId, string stepId)

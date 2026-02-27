@@ -27,6 +27,7 @@ public class NPC : BaseChat
         UIManager.Instance.OpenUI<ChatUI>(uiData);
 
         var chatUI = UIManager.Instance.GetActiveUI<ChatUI>();
+        AudioManager.Instance.PlaySFX(SFX.ui_open5);
         chatUI.SetChat(this, player);
     }
 
