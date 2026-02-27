@@ -42,4 +42,14 @@ public class PlayerInputManager : SingletonComponent<PlayerInputManager>
         chatEnterAction.Disable();
         interactAction.Disable();
     }
+
+    public void EnableInteraction()
+    {
+        interactAction.Enable();
+    }
+
+    public void DisableInteraction()
+    {
+        interactAction.Disable();
+    }
 }

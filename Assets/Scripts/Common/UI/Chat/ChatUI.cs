@@ -47,6 +47,13 @@ public class ChatUI : UIBase
             EventSystem.current.SetSelectedGameObject(null);
     }
 
+    public override void ShowUI()
+    {
+        base.ShowUI();
+
+        PlayerInputManager.Instance.DisableInteraction(); // NPC 상호작용 입력 차단
+    }
+
     // 채팅 끝내면 npc값 저장 초기화
     public override void CloseUI(bool isCloseAll = false)
     {
@@ -62,6 +69,8 @@ public class ChatUI : UIBase
 
         _busy = false;
         if (input) input.interactable = true;
+
+        PlayerInputManager.Instance.EnableInteraction(); // NPC 상호작용 입력 허용
 
         base.CloseUI(isCloseAll);
         npc = null;
