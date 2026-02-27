@@ -7,6 +7,15 @@ public class BootstrapManager : MonoBehaviour
 {
     private static bool s_initialized = false;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        s_initialized = false;
+
+        SingletonGate.Enable();
+        SingletonGate.ResetReleaseState();
+    }
+
     private void Awake()
     {
         // 중복 방지
