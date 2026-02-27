@@ -41,6 +41,7 @@ public class SceneLoader : SingletonComponent<SceneLoader>
     public void LoadScene(SceneType sceneType)
     {
         // 씬 로딩 코루틴 바로 시작
+        UIManager.Instance.CloseAllOpenUI();
         StartCoroutine(FadeOutThenLoad(sceneType));
     }
 

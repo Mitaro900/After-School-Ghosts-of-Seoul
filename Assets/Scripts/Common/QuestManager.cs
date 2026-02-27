@@ -501,6 +501,8 @@ public class QuestManager : SingletonComponent<QuestManager>
         OnQuestUpdated?.Invoke(quest.questId);
 
         Debug.Log($"퀘스트 완료: {quest.questName}");
+
+        SceneLoader.Instance.LoadScene(SceneType.Ending);
     }
     #endregion
 
