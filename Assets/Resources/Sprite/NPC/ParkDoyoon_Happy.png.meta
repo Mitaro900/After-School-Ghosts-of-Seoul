@@ -1,19 +1,10 @@
 fileFormatVersion: 2
-guid: 6e882c49e6f6859479359ac520f1dfa1
+guid: e7ac7c4433b1e0c4cb94e968a013fa64
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3905000240898659254
-    second: NPC_Profile_Test_0
-  - first:
-      213: -3665292605585397594
-    second: NPC_Profile_Test_1
-  - first:
-      213: -4895031709328906302
-    second: NPC_Profile_Test_2
-  - first:
-      213: 6236613712523845333
-    second: NPC_Profile_Test_3
+      213: -4988700381476533276
+    second: ParkDoyoon_Happy_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -109,89 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: NPC_Profile_Test_0
+      name: ParkDoyoon_Happy_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 200
-        height: 200
+        width: 848
+        height: 1264
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a4cab6178f6aec9c0800000000000000
-      internalID: -3905000240898659254
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: NPC_Profile_Test_1
-      rect:
-        serializedVersion: 2
-        x: 200
-        y: 0
-        width: 200
-        height: 200
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6a867367bc3422dc0800000000000000
-      internalID: -3665292605585397594
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: NPC_Profile_Test_2
-      rect:
-        serializedVersion: 2
-        x: 400
-        y: 0
-        width: 200
-        height: 200
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2c76d29689a511cb0800000000000000
-      internalID: -4895031709328906302
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: NPC_Profile_Test_3
-      rect:
-        serializedVersion: 2
-        x: 600
-        y: 0
-        width: 200
-        height: 200
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 5de5058e027ec8650800000000000000
-      internalID: 6236613712523845333
+      spriteID: 4eb4c3f2f6394cab0800000000000000
+      internalID: -4988700381476533276
       vertices: []
       indices: 
       edges: []
@@ -200,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 52b949047f8958248893a7b881afd2c0
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -208,14 +133,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries:
-      - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":200.0,"y":200.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+      entries: []
     nameFileIdTable:
-      NPC_Profile_Test_0: -3905000240898659254
-      NPC_Profile_Test_1: -3665292605585397594
-      NPC_Profile_Test_2: -4895031709328906302
-      NPC_Profile_Test_3: 6236613712523845333
+      ParkDoyoon_Happy_0: -4988700381476533276
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

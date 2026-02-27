@@ -260,6 +260,7 @@ public class ChatUI : UIBase
         EndBusy();
     }
 
+
     private void EndBusy()
     {
         _busy = false;
@@ -292,10 +293,15 @@ public class ChatUI : UIBase
     {
         TMP_Text tmp = bubble.InputText;
         Image targetProfile = isPlayer ? playerProfile : npcProfile;
-
         EmotionType currentEmotion = EmotionType.Neutral;
+
         if (sender != null)
-            targetProfile.sprite = sender.GetEmotionSprite(npc.NpcData, currentEmotion);
+        {
+            if (isPlayer)
+                targetProfile.sprite = sender.playerGetEmotionSprite(player, currentEmotion);
+            else
+                targetProfile.sprite = sender.npcGetEmotionSprite(npc.NpcData, currentEmotion);
+        }
 
         int visibleCharCount = 0;
 
@@ -307,7 +313,12 @@ public class ChatUI : UIBase
                 {
                     currentEmotion = newEmotion;
                     if (sender != null)
-                        targetProfile.sprite = sender.GetEmotionSprite(npc.NpcData, currentEmotion);
+                    {
+                        if (isPlayer)
+                            targetProfile.sprite = sender.playerGetEmotionSprite(player, currentEmotion);
+                        else
+                            targetProfile.sprite = sender.npcGetEmotionSprite(npc.NpcData, currentEmotion);
+                    }
                     continue;
                 }
             }
@@ -388,6 +399,12 @@ public class ChatUI : UIBase
         player = chattingPlayer;
 
         ChatLogManager.Instance.StartSession(npc.NpcData);
+
+        if (npc != null)
+            npcProfile.sprite = npc.GetComponent<BaseChat>().npcGetEmotionSprite(npc.NpcData, EmotionType.Neutral);
+
+        if (player != null)
+            playerProfile.sprite = player.GetComponent<BaseChat>().playerGetEmotionSprite(player, EmotionType.Neutral);
     }
 
     private void ClearChatBubbles()
