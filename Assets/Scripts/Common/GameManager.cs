@@ -1,4 +1,5 @@
 using Singleton.Component;
+using UnityEngine;
 
 public enum GameState
 {
@@ -41,11 +42,16 @@ public class GameManager : SingletonComponent<GameManager>
         CurrentState = newState;
     }
 
-
     public void SetPlayer(Player p)
     {
         // 임시로 Player Awke에서 사용중 (InGame State로 넘어갈시 플레이어쪽으로 가게하기)
         player = p;
+        //CameraManager.Instance.SetCamera(Camera.main);
         CameraManager.Instance.FollowCamera(player.transform);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }
