@@ -1,7 +1,10 @@
 using Singleton.Component;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Playables;
+using UnityEngine.UI;
 
 public enum CutsceneType
 {
@@ -11,6 +14,10 @@ public enum CutsceneType
 
 public class CutsceneController : SingletonComponent<CutsceneController>
 {
+    [SerializeField] private Image fadeImage;
+    [SerializeField] private float fadeDuration = 1f;
+    [SerializeField] private GameObject opCanvas;
+    [SerializeField] private GameObject edCanvas;
     [SerializeField] private PlayableDirector director;
     [SerializeField] private PlayableAsset introTimeline;
     [SerializeField] private PlayableAsset endingTimeline;
@@ -47,6 +54,8 @@ public class CutsceneController : SingletonComponent<CutsceneController>
         if (isPlaying) return;
 
         isPlaying = true;
+        opCanvas.SetActive(true);
+        edCanvas.SetActive(true);
 
         // 플레이어 움직임 막기
         GameManager.Instance.Player.PlayerMove(false);
@@ -66,6 +75,7 @@ public class CutsceneController : SingletonComponent<CutsceneController>
 
     private void Skip()
     {
+        fadeImage.gameObject.SetActive(true);
         director.time = director.duration;
         director.Evaluate();
         director.Stop();
@@ -74,9 +84,43 @@ public class CutsceneController : SingletonComponent<CutsceneController>
 
     private void Finish()
     {
+        StartCoroutine(FinishRoutine());
+    }
+
+    private IEnumerator FinishRoutine()
+    {
         isPlaying = false;
 
-        // 플레이어 다시 활성화
+        // 이벤트 중복 방지
+        director.stopped -= OnCutsceneEnd;
+
+        // 컷씬 정리
         GameManager.Instance.Player.PlayerMove(true);
+        AudioManager.Instance.PlayBGM(Music.배경음악2);
+
+        yield return StartCoroutine(Fade(1f, 0f));
+        fadeImage.gameObject.SetActive(false);
+        opCanvas.SetActive(false);
+        edCanvas.SetActive(false);
+    }
+
+    private IEnumerator Fade(float start, float end)
+    {
+        float time = 0f;
+        Color color = fadeImage.color;
+
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+            float alpha = Mathf.Lerp(start, end, time / fadeDuration);
+
+            color.a = alpha;
+            fadeImage.color = color;
+
+            yield return null;
+        }
+
+        color.a = end;
+        fadeImage.color = color;
     }
 }
