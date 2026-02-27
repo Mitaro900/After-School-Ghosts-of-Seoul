@@ -83,6 +83,7 @@ public class ChatUI : UIBase
         {
             AudioManager.Instance.PlaySFX(SFX.ui_close);
             npc.OffInteract();
+            player.openChat = false;
             player.PlayerMove(true);    // 플레이어 움직임 허용
         }
 

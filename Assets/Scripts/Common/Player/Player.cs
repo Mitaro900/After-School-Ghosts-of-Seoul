@@ -33,6 +33,8 @@ public class Player : BaseChat
     private Coroutine itemChatCoroutine;
     private Rigidbody2D rb;
 
+    public bool openChat = false;
+
     private void Awake()
     {
         anim = GetComponentInChildren<Animator>();
@@ -141,9 +143,10 @@ public class Player : BaseChat
     {
         if (PlayerInputManager.Instance.interactAction.WasPressedThisFrame())
         {
-            if (currentNPC != null)
+            if (currentNPC != null && !openChat)
             {
                 currentNPC.OnInteract(this);
+                openChat = true;
                 isMove = false;
             }
 
