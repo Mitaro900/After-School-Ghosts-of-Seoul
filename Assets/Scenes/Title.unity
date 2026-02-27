@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5205061174158396382, guid: d77cd8732257a0d41baf00406c65d2a3, type: 3}
+      propertyPath: m_PlayableAsset
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8029577496823160555, guid: d77cd8732257a0d41baf00406c65d2a3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -707,6 +711,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5822896783372481956, guid: 9b7e32e997a6b3f438d880cf8cb23159, type: 3}
+      propertyPath: fadeImage
+      value: 
+      objectReference: {fileID: 1848633890}
     - target: {fileID: 8067842014242691872, guid: 9b7e32e997a6b3f438d880cf8cb23159, type: 3}
       propertyPath: m_Name
       value: SceneLoader
@@ -773,6 +781,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d101f178c1fa2514c947458764de88cc, type: 3}
+--- !u!114 &1848633890 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3000709104170558145, guid: d77cd8732257a0d41baf00406c65d2a3, type: 3}
+  m_PrefabInstance: {fileID: 91247959}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1001 &1892140577
 PrefabInstance:
   m_ObjectHideFlags: 0

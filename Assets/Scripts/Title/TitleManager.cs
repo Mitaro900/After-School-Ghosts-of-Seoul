@@ -104,7 +104,14 @@ public class TitleManager : MonoBehaviour
             // 로딩 진행률이 90%인 경우
             if (m_AsyncOperation.progress == 0.9f)
             {
+                LoadingSlider.value = 1f;
+                LoadingProgressTxt.text = "100%";
+
                 // 씬 자동 활성화 허용
+                yield return new WaitForSeconds(0.4f);
+
+                yield return SceneLoader.Instance.FadeSceneOut(0.5f);
+
                 m_AsyncOperation.allowSceneActivation = true;
                 // 코루틴 종료
                 yield break;

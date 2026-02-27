@@ -37,7 +37,6 @@ public class Player : BaseChat
         if (itemChatUI != null)
             itemChatCG = itemChatUI.GetComponent<CanvasGroup>();
         GameManager.Instance.SetPlayer(this);
-        CutsceneController.Instance.PlayCutscene(CutsceneType.Intro);
     }
 
     protected override void Update()
@@ -128,9 +127,9 @@ public class Player : BaseChat
 
             if (currentTeleprot == zone)
             {
-                zone.HidePressEkeyUI();
                 currentTeleprot = null;
             }
+            zone.HidePressEkeyUI();
         }
     }
 
