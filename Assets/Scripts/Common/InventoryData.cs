@@ -1,7 +1,6 @@
 using Singleton.Data;
 using System;
 using System.Collections.Generic;
-using static UnityEditor.Progress;
 
 public class InventoryData : SingletonData<InventoryData>
 {

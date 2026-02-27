@@ -100,6 +100,7 @@ public class CutsceneController : SingletonComponent<CutsceneController>
         {
             SceneLoader.Instance.LoadScene(SceneType.Ending);
             AudioManager.Instance.PlayBGM(Music.ending);
+            Application.Quit();
         }
     }
 }
