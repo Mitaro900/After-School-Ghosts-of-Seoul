@@ -44,4 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a741d3c7a3208c4ea05b55a0a6f79ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuestManager
-  allQuests: []
+  allQuests:
+  - {fileID: 11400000, guid: f5bdd69897a149446b0d82c2b6e96e7b, type: 2}

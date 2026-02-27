@@ -1,5 +1,3 @@
-using NUnit.Framework.Interfaces;
-using System.Xml.Linq;
 using UnityEngine;
 
 public class QuestObject : MonoBehaviour

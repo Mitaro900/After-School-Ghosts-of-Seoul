@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b82b5bf21e3684a92edcac62c6cf2c, type: 3}
+  m_Name: EVID_RAILCAP
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: "\uB09C\uAC04 \uB9C8\uAC10 \uCEA1"
+  itemImage: {fileID: 0}
+  itemQuestPrompt: "\uB09C\uAC04 \uB9C8\uAC10 \uCEA1\uC744 \uBC1C\uACAC\uD588\uB2E4."
+  itemSlotPrompt: "\uACC4\uB2E8\uC5D0\uC11C \uC8FC\uC6B4 \uB09C\uAC04 \uCEA1. \uB2E8\uC21C
+    \uD30C\uC190 \uAC19\uC9C0 \uC54A\uB2E4."
