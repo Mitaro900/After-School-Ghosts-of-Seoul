@@ -15,6 +15,10 @@ MonoBehaviour:
   npcId: PARK_DOYOON
   displayName: "\uBC15\uB3C4\uC724"
   npcProfile: {fileID: -2220053423834057336, guid: 72c75709c2bc0e8408a5428d79b81edd, type: 3}
+  Neutral: {fileID: -1376607887233173851, guid: ed7ecaa326c03784991af6735f8b853b, type: 3}
+  Happy: {fileID: -4988700381476533276, guid: e7ac7c4433b1e0c4cb94e968a013fa64, type: 3}
+  Angry: {fileID: 3396993142367123873, guid: bb000402fda15824fbaccd1689318d15, type: 3}
+  Sad: {fileID: 1560563656779549749, guid: 1e2c962cbb29ef94bb39016e08e0b8d2, type: 3}
   npcPrompt: "\uB2F9\uC2E0\uC740 \uC8FC\uC778\uACF5\uC758 \uCE5C\uAD6C '\uBC15\uB3C4\uC724'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uC0AC\uAD50\uC801\uC774\uC9C0\uB9CC \uB208\uCE58\uAC00 \uBE60\uB984\r\n- \uD45C\uC815
     \uBCC0\uD654\uAC00 \uB9CE\uACE0, \uD559\uAD50 \uC0DD\uD65C, \uB3D9\uC544\uB9AC
