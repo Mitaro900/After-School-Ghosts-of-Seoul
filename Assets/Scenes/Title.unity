@@ -127,14 +127,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1381042529837809920, guid: d77cd8732257a0d41baf00406c65d2a3, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6585247513498923129, guid: d77cd8732257a0d41baf00406c65d2a3, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8029577496823160555, guid: d77cd8732257a0d41baf00406c65d2a3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -439,11 +431,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf81d377f7451394ebb4799c2d23c8e6, type: 3}
---- !u!224 &629141721 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 4716538147923204757, guid: dba9118de2525394dabf8b0c650c0d7f, type: 3}
-  m_PrefabInstance: {fileID: 1892140577}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &673385396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -720,10 +707,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4415726042995561591, guid: 9b7e32e997a6b3f438d880cf8cb23159, type: 3}
-      propertyPath: m_SortingOrder
-      value: 50
-      objectReference: {fileID: 0}
     - target: {fileID: 8067842014242691872, guid: 9b7e32e997a6b3f438d880cf8cb23159, type: 3}
       propertyPath: m_Name
       value: SceneLoader
@@ -741,10 +724,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1749355826548446157, guid: d101f178c1fa2514c947458764de88cc, type: 3}
-      propertyPath: m_ButtonUITrs
-      value: 
-      objectReference: {fileID: 629141721}
     - target: {fileID: 3640020872650507928, guid: d101f178c1fa2514c947458764de88cc, type: 3}
       propertyPath: m_Name
       value: UIManager
