@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d9ee9dcdd3574b64fa7bfe01639fbd46
+guid: bb000402fda15824fbaccd1689318d15
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1528640678113828841
-    second: ChoiGunwoo_Neutral_0
+      213: 3396993142367123873
+    second: ParkDoyoon_Angry_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ChoiGunwoo_Neutral_0
+      name: ParkDoyoon_Angry_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 71020dff66d29cae0800000000000000
-      internalID: -1528640678113828841
+      spriteID: 1a9fa33d34b842f20800000000000000
+      internalID: 3396993142367123873
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ChoiGunwoo_Neutral_0: -1528640678113828841
+      ParkDoyoon_Angry_0: 3396993142367123873
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

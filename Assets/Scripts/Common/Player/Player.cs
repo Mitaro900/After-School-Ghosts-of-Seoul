@@ -6,6 +6,10 @@ public class Player : BaseChat
 {
     [Header("Player Info")]
     public Sprite playerProfile;
+    public Sprite Neutral;
+    public Sprite Happy;
+    public Sprite Angry;
+    public Sprite Sad;
 
 
     [Header("Move")]

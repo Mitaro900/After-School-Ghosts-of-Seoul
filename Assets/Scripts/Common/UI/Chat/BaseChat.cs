@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using UnityEngine;
 
 public class BaseChat : MonoBehaviour
@@ -9,7 +10,7 @@ public class BaseChat : MonoBehaviour
 
 
     // ChatUI에 받은 emotion 값에 따라 알맞은 Sprite를 선택해서 반환
-    public Sprite GetEmotionSprite(NpcData npc, EmotionType emotion)
+    public Sprite npcGetEmotionSprite(NpcData npc, EmotionType emotion)
     {
         return emotion switch
         {
@@ -17,6 +18,17 @@ public class BaseChat : MonoBehaviour
             EmotionType.Angry => npc.Angry,
             EmotionType.Sad => npc.Sad,
             _ => npc.Neutral    // 모두 해당 안하면 기본표정
+        };
+    }
+
+    public Sprite playerGetEmotionSprite(Player player, EmotionType emotion)
+    {
+        return emotion switch
+        {
+            EmotionType.Happy => player.Happy,
+            EmotionType.Angry => player.Angry,
+            EmotionType.Sad => player.Sad,
+            _ => player.Neutral    // 모두 해당 안하면 기본표정
         };
     }
 
