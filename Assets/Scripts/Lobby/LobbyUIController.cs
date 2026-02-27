@@ -6,18 +6,14 @@ public class LobbyUIController : MonoBehaviour
 
     private void Start()
     {
+        AudioManager.Instance.PlayBGM(Music.배경음악1);
         UIManager.Instance.Fade(Color.black, 1f, 0f, 0.5f, 0f, true);
     }
 
     public void OnClickNewGameButton()
     {
-        // 새로운 게임 시작
-        //UIManager.Instance.Fade(Color.black, 0f, 1f, 0.5f, 0f, false, () =>
-        //{
-        //    SceneLoader.Instance.LoadScene(SceneType.InGame);
-        //});
-
-        SceneLoader.Instance.LoadScene(SceneType.InGame);
+        AudioManager.Instance.StopBGM();
+        SceneLoader.Instance.LoadScene(SceneType.Intro);
     }
 
     public void OnClickQuitButton()

@@ -402,9 +402,21 @@ public class ChatUI : UIBase
 
     public void SetChat(NPC chattingNpc, Player chattingPlayer)
     {
+        ClearChatBubbles();
+
         npc = chattingNpc;
         player = chattingPlayer;
 
         ChatLogManager.Instance.StartSession(npc.NpcData);
+    }
+
+    private void ClearChatBubbles()
+    {
+        for (int i = contentRect.childCount - 1; i >= 0; i--)
+        {
+            Destroy(contentRect.GetChild(i).gameObject);
+        }
+
+        scrollRect.verticalNormalizedPosition = 1f; // 스크롤 맨 위로 초기화
     }
 }

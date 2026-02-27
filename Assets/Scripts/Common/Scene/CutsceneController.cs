@@ -22,6 +22,7 @@ public class CutsceneController : SingletonComponent<CutsceneController>
     [SerializeField] private PlayableAsset introTimeline;
     [SerializeField] private PlayableAsset endingTimeline;
 
+    private CutsceneType currentType;
     private bool isPlaying = false;
 
     #region Singleton
@@ -57,13 +58,10 @@ public class CutsceneController : SingletonComponent<CutsceneController>
         opCanvas.SetActive(true);
         edCanvas.SetActive(true);
 
-        // 플레이어 움직임 막기
-        GameManager.Instance.Player.PlayerMove(false);
-
         // 타임라인 선택
         director.playableAsset =
             (type == CutsceneType.Intro) ? introTimeline : endingTimeline;
-
+        currentType = type;
         director.Play();
         director.stopped += OnCutsceneEnd;
     }
@@ -84,10 +82,10 @@ public class CutsceneController : SingletonComponent<CutsceneController>
 
     private void Finish()
     {
-        StartCoroutine(FinishRoutine());
+        FinishRoutine();
     }
 
-    private IEnumerator FinishRoutine()
+    private void FinishRoutine()
     {
         isPlaying = false;
 
@@ -95,32 +93,38 @@ public class CutsceneController : SingletonComponent<CutsceneController>
         director.stopped -= OnCutsceneEnd;
 
         // 컷씬 정리
-        GameManager.Instance.Player.PlayerMove(true);
         AudioManager.Instance.PlayBGM(Music.배경음악2);
 
-        yield return StartCoroutine(Fade(1f, 0f));
         fadeImage.gameObject.SetActive(false);
         opCanvas.SetActive(false);
         edCanvas.SetActive(false);
-    }
-
-    private IEnumerator Fade(float start, float end)
-    {
-        float time = 0f;
-        Color color = fadeImage.color;
-
-        while (time < fadeDuration)
+        if (currentType == CutsceneType.Intro)
         {
-            time += Time.deltaTime;
-            float alpha = Mathf.Lerp(start, end, time / fadeDuration);
-
-            color.a = alpha;
-            fadeImage.color = color;
-
-            yield return null;
+            SceneLoader.Instance.LoadScene(SceneType.InGame);
         }
-
-        color.a = end;
-        fadeImage.color = color;
+        else
+        {
+            SceneLoader.Instance.LoadScene(SceneType.Ending);
+        }
     }
+
+    //private IEnumerator Fade(float start, float end)
+    //{
+    //    float time = 0f;
+    //    Color color = fadeImage.color;
+
+    //    while (time < fadeDuration)
+    //    {
+    //        time += Time.deltaTime;
+    //        float alpha = Mathf.Lerp(start, end, time / fadeDuration);
+
+    //        color.a = alpha;
+    //        fadeImage.color = color;
+
+    //        yield return null;
+    //    }
+
+    //    color.a = end;
+    //    fadeImage.color = color;
+    //}
 }

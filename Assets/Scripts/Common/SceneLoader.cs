@@ -8,6 +8,7 @@ public enum SceneType
 {
     Lobby,
     Title,
+    Intro,
     InGame,
     Ending
 }
@@ -63,8 +64,6 @@ public class SceneLoader : SingletonComponent<SceneLoader>
         // 4. 씬 로딩 끝날 때까지 대기
         while (!asyncOp.isDone)
             yield return null;
-
-        CutsceneController.Instance.PlayCutscene(CutsceneType.Intro);
     }
 
     private IEnumerator Fade(float from, float to)
@@ -103,6 +102,15 @@ public class SceneLoader : SingletonComponent<SceneLoader>
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (fadeImage == null) return;
+
+        fadeImage.gameObject.SetActive(true);
+
+        Color color = fadeImage.color;
+        color.a = 1f;
+        fadeImage.color = color;
+
+        // 그 다음 페이드 인
         StartCoroutine(FadeSceneIn());
     }
 
