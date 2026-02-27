@@ -434,11 +434,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1674147865207338233, guid: 166332e4ee5f05d4a91de5e2a3954ea0, type: 3}
-      propertyPath: m_text
-      value: "\uBC29\uACFC\uD6C4, \uC11C\uC6B8\uC758 \uC720\uB839\uB4E4\n\uD504\uB85C\uC81D\uD2B8\uB97C
-        \uB9C8\uCE58\uACA0\uC2B5\uB2C8\uB2E4.\n\uAC10\uC0AC\uD569\uB2C8\uB2E4."
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

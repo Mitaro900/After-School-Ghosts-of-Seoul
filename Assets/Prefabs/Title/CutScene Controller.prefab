@@ -702,7 +702,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: End
+  m_text: "1\uB144 \uC804 \uC0AC\uACE0\uC758 \uC804\uB9D0\uC774 \uBC1D\uD600\uC84C\uB2E4.
+    \uCD5C\uAC74\uC6B0\uB294 \uC751\uB2F9\uD55C \uCC98\uBC8C\uC744 \uBC1B\uAC8C \uB420
+    \uAC83\uC774\uB2E4. \uC9C4\uC2E4\uC774 \uBC1D\uD600\uC9C0\uC790 \uAE40\uC5F0\uC6B0\uB294
+    \uB9C8\uC74C\uC774 \uD3B8\uD574\uC84C\uB2E4."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7ac69b7adaa07d84097b4196d0d551e9, type: 2}
   m_sharedMaterial: {fileID: -2963608034614012320, guid: 7ac69b7adaa07d84097b4196d0d551e9, type: 2}
@@ -896,8 +899,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ef1130019906234f929360a0bc3afbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneController
-  fadeImage: {fileID: 428685499537999847}
-  fadeDuration: 1
   opCanvas: {fileID: 1381042529837809920}
   edCanvas: {fileID: 6585247513498923129}
   director: {fileID: 5205061174158396382}
