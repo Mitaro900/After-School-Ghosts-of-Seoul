@@ -35,8 +35,6 @@ public class AudioManager : SingletonComponent<AudioManager>
     {
         LoadBGMPlayer();
         LoadSFXPlayer();
-
-        Debug.Log($"[AudioManager] Loaded: BGM={m_MusicPlayer.Count}, SFX={m_SFXPlayer.Count}");
     }
 
     protected override bool InitInstance()
