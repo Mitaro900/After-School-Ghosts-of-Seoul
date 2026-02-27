@@ -15,6 +15,10 @@ MonoBehaviour:
   npcId: CHOI_GUNWOO
   displayName: "\uCD5C\uAC74\uC6B0"
   npcProfile: {fileID: 8825244502827859042, guid: fe4ef63b47e686546930fffb560619bb, type: 3}
+  Neutral: {fileID: -1528640678113828841, guid: d9ee9dcdd3574b64fa7bfe01639fbd46, type: 3}
+  Happy: {fileID: 1620695405565655522, guid: fc6eff9ba0c2e4c4db267e98224f5522, type: 3}
+  Angry: {fileID: -1763764393585642982, guid: 1a5cface3784d97438e87fd1bfbc4388, type: 3}
+  Sad: {fileID: -5459964441042949776, guid: 460c79982cd6df545831c0dc7b67e8c2, type: 3}
   npcPrompt: "\uB2F9\uC2E0\uC740 \uD559\uD3ED \uAC00\uD574\uC790 '\uCD5C\uAC74\uC6B0'\uC785\uB2C8\uB2E4.\r\n\r\n[\uC131\uACA9]\r\n-
     \uC790\uAE30\uD569\uB9AC\uD654\uAC00 \uAC15\uD558\uACE0 \uCC45\uC784\uC744 \uD68C\uD53C\uD558\uB294
     \uD0C0\uC785\r\n- \uD798\uC758 \uC6B0\uC704\uB97C \uD3ED\uB825\uC774\uB77C\uAE30\uBCF4\uB2E4
@@ -38,4 +42,4 @@ MonoBehaviour:
     \uC720\uB839\uC774 \uBCF4\uC778\uB2E4\uACE0 \uD558\uC9C0 \uB9C8\uC138\uC694\r\n-
     \uC808\uB300 5\uBB38\uC7A5\uC744 \uCD08\uACFC\uD558\uC9C0 \uB9C8\uC138\uC694"
   relatedQuests:
-  - {fileID: 11400000, guid: 12d58fb336dcf9648a495b163e33104b, type: 2}
+  - {fileID: 11400000, guid: f5bdd69897a149446b0d82c2b6e96e7b, type: 2}

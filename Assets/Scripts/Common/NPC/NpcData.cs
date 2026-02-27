@@ -12,6 +12,11 @@ public class NpcData : ScriptableObject
 
     public Sprite npcProfile;
 
+    public Sprite Neutral;
+    public Sprite Happy;
+    public Sprite Angry;
+    public Sprite Sad;
+
     [Header("AI Prompt")]
     [TextArea] public string npcPrompt;
 

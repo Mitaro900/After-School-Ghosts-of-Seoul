@@ -286,7 +286,7 @@ public class ChatUI : UIBase
 
         EmotionType currentEmotion = EmotionType.Neutral;
         if (sender != null)
-            targetProfile.sprite = sender.GetEmotionSprite(currentEmotion);
+            targetProfile.sprite = sender.GetEmotionSprite(npc.NpcData, currentEmotion);
 
         int visibleCharCount = 0;
 
@@ -298,7 +298,7 @@ public class ChatUI : UIBase
                 {
                     currentEmotion = newEmotion;
                     if (sender != null)
-                        targetProfile.sprite = sender.GetEmotionSprite(currentEmotion);
+                        targetProfile.sprite = sender.GetEmotionSprite(npc.NpcData, currentEmotion);
                     continue;
                 }
             }

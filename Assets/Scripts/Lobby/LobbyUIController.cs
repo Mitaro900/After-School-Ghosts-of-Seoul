@@ -13,7 +13,7 @@ public class LobbyUIController : MonoBehaviour
     public void OnClickNewGameButton()
     {
         AudioManager.Instance.StopBGM();
-        SceneLoader.Instance.LoadScene(SceneType.Intro);
+        SceneLoader.Instance.LoadScene(SceneType.Ending);
     }
 
     public void OnClickQuitButton()
