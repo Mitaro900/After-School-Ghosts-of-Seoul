@@ -7,9 +7,6 @@ public class BootstrapManager : MonoBehaviour
 {
     private static bool s_initialized = false;
 
-    [Header("초기화 옵션")]
-    [SerializeField] private bool initializeOnAwake = true;
-
     private void Awake()
     {
         // 중복 방지
@@ -22,13 +19,13 @@ public class BootstrapManager : MonoBehaviour
         s_initialized = true;
         DontDestroyOnLoad(gameObject);
 
-        Singleton.SingletonGate.Enable();
-        Singleton.SingletonGate.ResetReleaseState();
+        SingletonGate.Enable();
+        SingletonGate.ResetReleaseState();
+    }
 
-        if (initializeOnAwake)
-        {
-            InitializeAllSingletons();
-        }
+    private void Start()
+    {
+        InitializeAllSingletons();
     }
 
     public static void InitializeAllSingletons()

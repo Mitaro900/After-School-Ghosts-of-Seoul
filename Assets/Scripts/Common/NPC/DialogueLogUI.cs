@@ -21,6 +21,8 @@ public class DialogueLogUI : UIBase
     {
         base.ShowUI();
 
+        AudioManager.Instance.PlaySFX(SFX.ui_open);
+
         // ChatLogManager에 등록된 모든 NPC 데이터 가져오기
         foreach (var npcPair in ChatLogManager.Instance.GetAllNpcSessions())
         {

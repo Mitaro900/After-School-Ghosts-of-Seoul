@@ -26,8 +26,15 @@ public class CameraManager : SingletonComponent<CameraManager>
         }
     }
 
-    protected override bool InitInstance() => true;
-    protected override void ReleaseInstance() { }
+    protected override bool InitInstance()
+    {
+        return true;
+    }
+
+    protected override void ReleaseInstance()
+    {
+
+    }
     #endregion
 
     private void LateUpdate()

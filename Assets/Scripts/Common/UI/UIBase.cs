@@ -72,7 +72,7 @@ public class UIBase : MonoBehaviour
     // 닫기 버튼 클릭 시 실행되는 메서드
     public virtual void OnClickCloseButton()
     {
-        //AudioManager.Instance.PlaySFX(SFX.ui_button_click);    // 버튼 클릭 효과음 재생
+        AudioManager.Instance.PlaySFX(SFX.ui_close);    // 버튼 클릭 효과음 재생
         CloseUI();    // UI 닫기 실행
     }
 }

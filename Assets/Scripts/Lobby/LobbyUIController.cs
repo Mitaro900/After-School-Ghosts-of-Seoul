@@ -6,7 +6,7 @@ public class LobbyUIController : MonoBehaviour
 
     private void Start()
     {
-        AudioManager.Instance.PlayBGM(Music.배경음악1);
+        AudioManager.Instance.PlayBGM(Music.lobby);
         UIManager.Instance.Fade(Color.black, 1f, 0f, 0.5f, 0f, true);
     }
 

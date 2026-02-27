@@ -14,8 +14,6 @@ public enum CutsceneType
 
 public class CutsceneController : SingletonComponent<CutsceneController>
 {
-    [SerializeField] private Image fadeImage;
-    [SerializeField] private float fadeDuration = 1f;
     [SerializeField] private GameObject opCanvas;
     [SerializeField] private GameObject edCanvas;
     [SerializeField] private PlayableDirector director;
@@ -73,7 +71,6 @@ public class CutsceneController : SingletonComponent<CutsceneController>
 
     private void Skip()
     {
-        fadeImage.gameObject.SetActive(true);
         director.time = director.duration;
         director.Evaluate();
         director.Stop();
@@ -92,10 +89,6 @@ public class CutsceneController : SingletonComponent<CutsceneController>
         // 이벤트 중복 방지
         director.stopped -= OnCutsceneEnd;
 
-        // 컷씬 정리
-        AudioManager.Instance.PlayBGM(Music.배경음악2);
-
-        fadeImage.gameObject.SetActive(false);
         opCanvas.SetActive(false);
         edCanvas.SetActive(false);
         if (currentType == CutsceneType.Intro)

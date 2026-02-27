@@ -14,12 +14,6 @@ public enum SceneType
 }
 public class SceneLoader : SingletonComponent<SceneLoader>
 {
-    [Header("Fade Settings")]
-    [SerializeField] private Image fadeImage;
-    [SerializeField] private float fadeDuration = 1f;
-
-    public Image FadeImage => fadeImage;
-
     #region Singleton
     protected override void AwakeInstance()
     {
@@ -34,15 +28,15 @@ public class SceneLoader : SingletonComponent<SceneLoader>
 
     protected override void ReleaseInstance()
     {
-
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
     #endregion
+
     public AsyncOperation LoadSceneAsync(SceneType sceneType)
     {
         AsyncOperation asyncOp = SceneManager.LoadSceneAsync(sceneType.ToString());
         return asyncOp;
     }
-
 
     public void LoadScene(SceneType sceneType)
     {
@@ -66,35 +60,10 @@ public class SceneLoader : SingletonComponent<SceneLoader>
             yield return null;
     }
 
-    private IEnumerator Fade(float from, float to)
-    {
-        if (fadeImage == null) yield break;
-
-        fadeImage.gameObject.SetActive(true);
-        Color color = fadeImage.color;
-        float time = 0f;
-
-        while (time < fadeDuration)
-        {
-            time += Time.deltaTime;
-            color.a = Mathf.Lerp(from, to, time / fadeDuration);
-            fadeImage.color = color;
-            yield return null;
-        }
-
-        color.a = to;
-        fadeImage.color = color;
-
-        if (to == 0f)
-            fadeImage.gameObject.SetActive(false);
-    }
-
     public IEnumerator FadeSceneOut(float holdDuration = 0.5f)
     {
-        if (fadeImage == null) yield break;
-
         // 페이드 아웃
-        yield return Fade(0, 1);
+        UIManager.Instance.Fade(Color.black, 0f, 1f, 0.5f, 0f, false);
 
         // 검정 화면 유지
         yield return new WaitForSeconds(holdDuration);
@@ -102,20 +71,6 @@ public class SceneLoader : SingletonComponent<SceneLoader>
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (fadeImage == null) return;
-
-        fadeImage.gameObject.SetActive(true);
-
-        Color color = fadeImage.color;
-        color.a = 1f;
-        fadeImage.color = color;
-
-        // 그 다음 페이드 인
-        StartCoroutine(FadeSceneIn());
-    }
-
-    public IEnumerator FadeSceneIn()
-    {
-        yield return Fade(1, 0);
+        UIManager.Instance.Fade(Color.black, 1f, 0f, 0.5f, 0f, true);
     }
 }

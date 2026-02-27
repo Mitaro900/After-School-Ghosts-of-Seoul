@@ -4,16 +4,17 @@ using UnityEngine;
 
 public enum Music
 {
-    배경음악1,
-    배경음악2,
-    배경음악3,
-    배경음악4,
-    배경음악5,
+    lobby,
+    intro,
+    ingame,
+    ending,
     COUNT
 }
 
 public enum SFX
 {
+    ui_open,
+    ui_close,
     COUNT
 }
 
@@ -29,20 +30,13 @@ public class AudioManager : SingletonComponent<AudioManager>
 
     private Dictionary<SFX, AudioSource> m_SFXPlayer = new Dictionary<SFX, AudioSource>();
 
-    private float masterVolume = 0.5f;
-    private float musicVolume = 0.5f;
-    private float sfxVolume = 0.5f;
-
-    [SerializeField] private GameObject VolumeSetting;
-    private bool openSetting = true;
-
     #region Singleton
     protected override void AwakeInstance()
     {
         LoadBGMPlayer();
         LoadSFXPlayer();
 
-        ApplyVolumes();   // ⭐ 초기 50% 적용
+        Debug.Log($"[AudioManager] Loaded: BGM={m_MusicPlayer.Count}, SFX={m_SFXPlayer.Count}");
     }
 
     protected override bool InitInstance()
@@ -158,22 +152,20 @@ public class AudioManager : SingletonComponent<AudioManager>
         m_SFXPlayer[sfx].Play();
     }
 
-    public void SetMasterVolume(float volume)
+    public void SetMusicVolume(float _volume)
     {
-        masterVolume = Mathf.Clamp01(volume);
-        ApplyVolumes();
+        foreach (var audioSourceItem in m_MusicPlayer)
+        {
+            audioSourceItem.Value.volume = _volume;
+        }
     }
 
-    public void SetMusicVolume(float volume)
+    public void SetSFXVolume(float _volume)
     {
-        musicVolume = Mathf.Clamp01(volume);
-        ApplyVolumes();
-    }
-
-    public void SetSFXVolume(float volume)
-    {
-        sfxVolume = Mathf.Clamp01(volume);
-        ApplyVolumes();
+        foreach (var audioSourceItem in m_SFXPlayer)
+        {
+            audioSourceItem.Value.volume = _volume;
+        }
     }
 
     public void MuteMusic(bool _mute)
@@ -189,36 +181,6 @@ public class AudioManager : SingletonComponent<AudioManager>
         foreach (var audioSourceItem in m_SFXPlayer)
         {
             audioSourceItem.Value.mute = _mute;
-        }
-    }
-
-    private void ApplyVolumes()
-    {
-        float finalMusic = masterVolume * musicVolume;
-        float finalSFX = masterVolume * sfxVolume;
-
-        foreach (var item in m_MusicPlayer)
-        {
-            item.Value.volume = finalMusic;
-        }
-
-        foreach (var item in m_SFXPlayer)
-        {
-            item.Value.volume = finalSFX;
-        }
-    }
-
-    public void OnVolumesSetting()
-    {
-        if (openSetting)
-        {
-            VolumeSetting.SetActive(true);
-            openSetting = false;
-        }
-        else
-        {
-            VolumeSetting.SetActive(false);
-            openSetting = true;
         }
     }
 }
