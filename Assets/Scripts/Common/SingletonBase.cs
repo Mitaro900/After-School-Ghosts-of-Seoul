@@ -176,12 +176,12 @@ namespace Singleton
                     }
 
                     if (m_instance == null)
-					{
-						m_instance = new T();
-						PushSingleton(m_instance);
-					}
-					return m_instance;
-				}
+                    {
+                        m_instance = new T();
+                        PushSingleton(m_instance);
+                    }
+                    return m_instance;
+                }
 			}
 
             private bool _initialized = false;
