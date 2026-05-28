@@ -5,24 +5,25 @@ NPC 대화 시스템은 별도의 Node.js 프록시 서버를 통해 OpenAI API�
 개발 기간: 2026-02-02 ~ 2026-02-27
 
 # 실행 방법
-서버 저장소에서 먼저 서버를 실행해주세요: \
+## (선택 사항) 로컬에서 테스트하고 싶다면
+서버 저장소의 파일을 다운로드 받고, README에 적힌 순서대로 로컬 서버를 구축해주세요: \
 https://github.com/Mitaro900/OpenAI-Proxy
 
-Unity에서 다음을 확인하세요:
+로컬 서버를 구축했다면, Unity에서 다음을 확인하세요:
 
 🔹 OpenAIManager 설정 \
-API_URL = http://localhost:3000/chat
+API_URL = http://localhost:8080/chat
 
 
 필요 시: \
 AppToken = (서버에서 사용하는 경우 동일 값 입력)
 
-플레이 테스트:
-1. Unity에서 Play ▶
+## 플레이 테스트
+1. Unity에서 Scenes 폴더의 Title 씬으로 들어간 후 Play ▶
 2. 채팅창에서 메시지 입력
 3. NPC 응답 출력 확인
 
-🛠 요구사항
+## 🛠 요구사항
 
 - Unity 2022 LTS 이상
 
