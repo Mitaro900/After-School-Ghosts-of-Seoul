@@ -22,7 +22,11 @@ public class Item : MonoBehaviour
     // 획득시 플레이어가 퀘스트 관련 대사 (ex 이 아이템을 누군가에게 전해주자)
     public string GetItemPrompt()
     {
-        InventoryData.Instance.AddItem(itemData);    // 아이템 슬롯에 등록
+        // 인벤토리 데이터 인스턴스 확인
+        if (InventoryData.TryGetInstance(out var inventory))
+        {
+            inventory.AddItem(itemData); // 아이템 슬롯에 등록
+        }
 
         Destroy(gameObject);
         return itemData.ItemQuestPrompt;

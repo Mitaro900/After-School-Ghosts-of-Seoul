@@ -13,19 +13,21 @@ public class InventorySlot
 
 public class HUD : MonoBehaviour
 {
-    public static HUD Instance;
     [SerializeField] private GameObject hudPanel;
 
     private InventoryData _inventory;
+    private InventoryData Inventory
+    {
+        get
+        {
+            if (_inventory == null) InventoryData.TryGetInstance(out _inventory);
+            return _inventory;
+        }
+    }
 
     [SerializeField] private List<InventorySlot> slots;
     [SerializeField] private TextMeshProUGUI questinfo1;
     [SerializeField] private TextMeshProUGUI questinfo2;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
 
     private void Start()
     {
@@ -36,7 +38,9 @@ public class HUD : MonoBehaviour
 
     private void OnEnable()
     {
-        if (InventoryData.TryGetInstance(out _inventory))
+        _inventory = InventoryData.Instance;
+
+        if (_inventory != null)
         {
             _inventory.OnInventoryChanged += RefreshUI;
             RefreshUI();
@@ -46,7 +50,9 @@ public class HUD : MonoBehaviour
     private void OnDisable()
     {
         if (_inventory != null)
+        {
             _inventory.OnInventoryChanged -= RefreshUI;
+        }
     }
 
     private void OnQuestUpdated(string questId)
@@ -78,7 +84,7 @@ public class HUD : MonoBehaviour
     // 아이템 등록 (Item, QuestManager 사용중)
     public bool AddItem(ItemData newItem)
     {
-        if(_inventory.AddItem(newItem))
+        if(Inventory.AddItem(newItem))
         {
             QuestManager.Instance.CheckQuestComplete(newItem.ItemName);
 
@@ -99,7 +105,7 @@ public class HUD : MonoBehaviour
 
     public void RemoveItem(ItemData item)
     {
-        _inventory.RemoveItem(item);
+        Inventory.RemoveItem(item);
     }
 
     // 현재 아이템을 들고있는지 확인 (QuestManager에서 사용)
@@ -113,39 +119,39 @@ public class HUD : MonoBehaviour
         return false;
     }
 
-    public bool HasItem(ItemData item)
-    {
-        foreach (var slot in slots)
-        {
-            if (slot.itemData == item)
-                return true;
-        }
-
-        return false;
-    }
+    public bool HasItem(ItemData item) => Inventory.HasItem(item);
 
     // 아이템 이미지 등록 및 제거
     public void RefreshUI()
     {
+        // _inventory가 null일 경우를 대비한 방어 코드
+        if (Inventory == null) return;
+
         for (int i = 0; i < slots.Count; i++)
         {
-            if (i < _inventory.Items.Count)
-            {
-                slots[i].itemData = _inventory.Items[i];
-                slots[i].itemImage.sprite = slots[i].itemData.ItemImage;
-                slots[i].itemImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                slots[i].itemData = null;
+            // 일단 해당 슬롯을 '비어있음' 상태로 초기화 (방어적 코드)
+            slots[i].itemData = null;
+            if (slots[i].itemImage != null)
                 slots[i].itemImage.gameObject.SetActive(false);
+
+            // 그 다음, 데이터가 존재하는 인덱스라면 데이터를 입힘
+            if (i < Inventory.Items.Count)
+            {
+                ItemData data = Inventory.Items[i];
+
+                if (data != null)
+                {
+                    slots[i].itemData = data;
+                    slots[i].itemImage.sprite = data.ItemImage;
+                    slots[i].itemImage.gameObject.SetActive(true);
+                }
             }
         }
     }
 
     public void AddItemToHUD(ItemData newItem)
     {
-        if (_inventory.AddItem(newItem))
+        if (Inventory.AddItem(newItem))
         {
             RefreshUI();
         }
