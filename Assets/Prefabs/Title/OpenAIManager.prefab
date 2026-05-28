@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cabb66e1a35a03408d4653abd304838, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OpenAIManager
-  API_URL: http://localhost:3000/chat
+  API_URL: https://unity-ai-chat-server-1050520489631.asia-northeast3.run.app/chat
   appToken: mygame-dev-token

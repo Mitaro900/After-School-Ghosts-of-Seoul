@@ -6,10 +6,10 @@ using Singleton.Component;
 
 public class OpenAIManager : SingletonComponent<OpenAIManager>
 {
-    // 로컬 테스트: http://localhost:3000/chat
+    // 로컬 테스트: http://localhost:8080/chat
     // Android 에뮬레이터: http://10.0.2.2:3000/chat
     // Cloud Run: https://YOUR_SERVICE-xxxxx.a.run.app/chat
-    [SerializeField] private string API_URL = "http://localhost:3000/chat";
+    [SerializeField] private string API_URL = "http://localhost:8080/chat";
 
     // (옵션) 프록시에 간단 인증을 붙였을 때만 사용
     // 서버에서 X-App-Token 헤더를 검사하도록 만들면 됨.
